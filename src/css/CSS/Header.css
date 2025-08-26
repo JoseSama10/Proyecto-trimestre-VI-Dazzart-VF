@@ -1,0 +1,102 @@
+/* --- HEADER --- */
+header .btn {
+  color: #000000;
+  border-color: #ffffff;
+  font-size: 17px;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+header .btn-outline-info {
+  border-color: #ffffff;
+  color: #000000;
+}
+
+header .btn-outline-info:hover {
+  color: #9b9898;
+  background-color: transparent;
+  border-color: #9b9898;
+}
+
+header .btn-outline-warning {
+  border-color: #ffffff;
+  color: #000000;
+}
+
+header .input-group .form-control {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+
+header .input-group button {
+  background-color: transparent;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+header .btn:hover {
+  background-color: #80808000;
+  color: #1370bd;
+  border-color: #00000000;
+}
+
+/* Logo estilo retro */
+.text-logo {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px; /* antes 14px */
+  line-height: 1.2;
+  color: #111;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+
+
+.text-logo span {
+  color: #000000;
+}
+
+/* Barra de búsqueda */
+.search-wrapper {
+  position: relative;
+  background-color: #f0f0f0;
+  border-radius: 15px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  width: 260px;
+  height: 40px;
+}
+
+.search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+.search-icon {
+  color: #333;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
