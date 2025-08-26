@@ -1,0 +1,15 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de entorno
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Compilados temporales
+dist/

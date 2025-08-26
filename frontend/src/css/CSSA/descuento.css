@@ -1,0 +1,23 @@
+
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+
+  /* Ajuste del contenido principal */
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+  }
+
+  /* Ocultar sidebar en móviles y usar Offcanvas */
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+    .main-content {
+      margin-left: 0;
+    }
+  }
+

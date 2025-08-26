@@ -1,0 +1,116 @@
+# Endpoints utilizados en el frontend (React)
+
+## Endpoints principales:
+- `http://localhost:3001/api/login/login` (login de usuario)
+- `http://localhost:3001/api/usuarios/register` (registro de usuario)
+- `http://localhost:3001/api/productos/listar` (listado de productos)
+- `http://localhost:3001/api/categorias/listar` (listado de categorías)
+- `http://localhost:3001/api/subcategorias/listar` (listado de subcategorías)
+- `http://localhost:3001/api/carrito` (POST para agregar al carrito)
+- `http://localhost:3001/api/carrito/:id_usuario` (GET para obtener el carrito de un usuario, DELETE para eliminar)
+- `http://localhost:3001/api/pedidos` (POST para crear pedido)
+
+## Archivos donde se usan:
+- `frontend/src/components/cliente/carrito.jsx`
+- `frontend/src/components/cliente/ModalLogin.jsx`
+- `frontend/src/pages/cliente/Registro.jsx`
+- `frontend/src/pages/cliente/VistaProductos.jsx`
+- `frontend/src/pages/cliente/VistaBusqueda.jsx`
+- `frontend/src/components/cliente/MenuLateral.jsx`
+
+---
+
+# Ejemplo de estructura de página: CarritoPage.jsx
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import Headersimple from '../../components/cliente/SimpleHeader'
+import Footer from '../../components/cliente/Footer';
+import Carrito from '../../components/cliente/Carrito';
+import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
+import ModalLogin from '../../components/cliente/ModalLogin';
+
+import '../../css/CSS/CarritoPage.css';
+
+export default function CarritoPage() {
+  const navigate = useNavigate();
+
+  // Usuario desde localStorage
+  const usuarioGuardado = localStorage.getItem('usuario');
+  const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
+  const id_usuario = usuario ? usuario.id_usuario : null;
+  const direccion = usuario ? usuario.direccion : '';
+
+  // Estados para modales
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState('');
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [mostrarCarrito, setMostrarCarrito] = useState(false);
+
+  // Logout
+  const handleLogout = () => {
+    localStorage.removeItem('usuario');
+    window.location.reload();
+  };
+
+  // Abrir login modal
+  const handleOpenLogin = () => setMostrarLogin(true);
+
+  // Cerrar login modal
+  const handleCloseLogin = () => setMostrarLogin(false);
+
+  // Al hacer login con éxito
+  const onLoginSuccess = (user) => {
+    localStorage.setItem('usuario', JSON.stringify(user));
+    setMostrarLogin(false);
+    window.location.reload();
+  };
+
+  return (
+    <div className="d-flex flex-column min-vh-100">
+      {/* Header */}
+     <Headersimple/>
+
+      {/* Main */}
+      <main className="container mt-5 flex-grow-1">
+        <Carrito
+          id_usuario={id_usuario}
+          direccion={direccion}
+          onOpenLogin={handleOpenLogin}
+        />
+      </main>
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Modales */}
+      <ModalConfirmacion
+        show={mostrarModal}
+        mensaje={modalMensaje}
+        onClose={() => setMostrarModal(false)}
+        onIrCarrito={() => {
+          setMostrarModal(false);
+          navigate('/carrito');
+        }}
+      />
+
+      {mostrarLogin && (
+        <ModalLogin
+          visible={mostrarLogin}
+          onClose={handleCloseLogin}
+          onLoginSuccess={onLoginSuccess}
+        />
+      )}
+
+      {/* Aquí podrías agregar menú lateral o carrito modal si los manejas desde aquí */}
+    </div>
+  );
+}
+```
+
+---
+
+¿Necesitas el detalle de cada endpoint por componente o alguna explicación adicional?
