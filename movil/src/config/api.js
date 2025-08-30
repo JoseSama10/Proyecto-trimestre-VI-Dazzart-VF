@@ -33,8 +33,9 @@ API.interceptors.request.use(async (config) => {
         }
         return config;
     } catch (error) {
-        return config; 
+        return null;
     }
+
 });
 
 export default API;

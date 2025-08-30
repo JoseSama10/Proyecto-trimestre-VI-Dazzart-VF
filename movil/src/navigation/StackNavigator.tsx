@@ -44,6 +44,7 @@ export default function StackNavigator() {
         component={Subcategorias}
         options={{ title: 'Subcategorías' }}
       />
+
     </Stack.Navigator>
   );
 }
