@@ -4,6 +4,7 @@ import { Picker } from "@react-native-picker/picker";
 import api, { setBaseURL } from "../../config/api";
 import MenuLateral from "../../Components/Admin/MenuLateral";
 import Icon from "react-native-vector-icons/FontAwesome6";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function SubcategoriasAdmin() {
   const [subcategorias, setSubcategorias] = useState([]);
@@ -23,14 +24,12 @@ export default function SubcategoriasAdmin() {
   const [refreshing, setRefreshing] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-  useEffect(() => {
-    const init = async () => {
-      await setBaseURL();
-      await cargarCategorias();
-      await cargarSubcategorias();
-    };
-    init();
-  }, []);
+    useFocusEffect(
+    React.useCallback(() => {
+      cargarSubcategorias();
+      cargarCategorias();
+    }, [])
+  );
 
   const cargarCategorias = async () => {
     try {

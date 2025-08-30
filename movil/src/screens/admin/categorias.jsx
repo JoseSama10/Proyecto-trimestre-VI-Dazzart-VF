@@ -14,6 +14,7 @@ import {
 import api, { setBaseURL } from "../../config/api";
 import MenuLateral from "../../Components/Admin/MenuLateral";
 import Icon from "react-native-vector-icons/FontAwesome6";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function CategoriasAdmin() {
   const [categorias, setCategorias] = useState([]);
@@ -23,13 +24,13 @@ export default function CategoriasAdmin() {
   const [refreshing, setRefreshing] = useState(false);
   const [showMenu, setShowMenu] = useState(false); // Estado para mostrar/ocultar menú
 
-  useEffect(() => {
-    const init = async () => {
-      await setBaseURL();
-      await cargarCategorias();
-    };
-    init();
-  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      cargarCategorias();
+    }, [])
+  );
+  
 
   const cargarCategorias = async () => {
     setRefreshing(true);
