@@ -1,35 +1,40 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
-import * as Network from "expo-network";
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-const api = axios.create(); // instancia única
+const getBaseURL = () => {
+    if (process.env.BACKEND_URL) {
+        return process.env.BACKEND_URL;
+    }
 
-export const setBaseURL = async () => {
-  let baseURL = "http://192.168.1.5:3001/api";
+    if (Platform.OS === 'web') {
+        return 'http://localhost:3001/api';
+    }
 
-  if (Platform.OS === "web") baseURL = "http://localhost:3001/api";
-  else if (Platform.OS === "android") baseURL = "http://192.168.1.5:3001/api";
-  else if (Platform.OS === "ios") baseURL = "http://192.168.1.5:3001/api";
+    if (Constants.expoConfig?.hostUri) {
+        const ip = Constants.expoConfig.hostUri.split(':')[0];
+        return `http://${ip}:3001/api`;
+    }
 
-  try {
-    const ip = await Network.getIpAddressAsync();
-    // Solo usa esta línea si tu backend está corriendo en el mismo dispositivo
-    // baseURL = `http://${ip}:3001/api`;
-  } catch {}
-
-  api.defaults.baseURL = baseURL;
-  api.defaults.timeout = 10000;
-
-  // Interceptor para token (solo se agrega una vez)
-  // if (!api.interceptors.request.handlers.length) {
-  //   api.interceptors.request.use(async (config) => {
-  //     const token = await AsyncStorage.getItem("token");
-  //     if (token) config.headers.Authorization = `Bearer ${token}`;
-  //     return config;
-  //   });
-  // }
-  
+    return 'http://localhost:3001/api';
 };
 
-export default api;
+const API = axios.create({
+    baseURL: getBaseURL(),
+    timeout: 10000,
+});
+
+API.interceptors.request.use(async (config) => {
+    try {
+        const token = await AsyncStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    } catch (error) {
+        return config; 
+    }
+});
+
+export default API;
