@@ -1,7 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Alert, SafeAreaView, RefreshControl } from "react-native";
-import React, { useEffect, useState } from "react";
+ import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Alert, SafeAreaView, RefreshControl } from "react-native";
+import React, { useState } from "react";
 import { Picker } from "@react-native-picker/picker";
-import api, { setBaseURL } from "../../config/api";
+import API from "../../config/api";  // 🔹 corregido
 import MenuLateral from "../../Components/Admin/MenuLateral";
 import Icon from "react-native-vector-icons/FontAwesome6";
 import { useFocusEffect } from "@react-navigation/native";
@@ -24,7 +24,7 @@ export default function SubcategoriasAdmin() {
   const [refreshing, setRefreshing] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 
-    useFocusEffect(
+  useFocusEffect(
     React.useCallback(() => {
       cargarSubcategorias();
       cargarCategorias();
@@ -33,7 +33,7 @@ export default function SubcategoriasAdmin() {
 
   const cargarCategorias = async () => {
     try {
-      const res = await api.get("/categorias/listar");
+      const res = await API.get("/categorias/listar"); // 🔹 cambiado api -> API
       setCategorias(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error al cargar categorías:", err);
@@ -44,7 +44,7 @@ export default function SubcategoriasAdmin() {
   const cargarSubcategorias = async () => {
     setRefreshing(true);
     try {
-      const res = await api.get("/subcategorias/listar");
+      const res = await API.get("/subcategorias/listar"); // 🔹 cambiado api -> API
       setSubcategorias(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error al cargar subcategorías:", err);
@@ -59,7 +59,7 @@ export default function SubcategoriasAdmin() {
       return Alert.alert("Error", "Completa todos los campos");
     }
     try {
-      await api.post("/subcategorias/agregar", form);
+      await API.post("/subcategorias/agregar", form); // 🔹 cambiado api -> API
       setForm({ nombre_subcategoria: "", descripcion_subcategoria: "", id_categoria: "" });
       await cargarSubcategorias();
     } catch (err) {
@@ -76,7 +76,7 @@ export default function SubcategoriasAdmin() {
         style: "destructive",
         onPress: async () => {
           try {
-            await api.delete(`/subcategorias/eliminar/${id}`);
+            await API.delete(`/subcategorias/eliminar/${id}`); // 🔹 cambiado api -> API
             await cargarSubcategorias();
           } catch (err) {
             console.error(err);
@@ -103,7 +103,7 @@ export default function SubcategoriasAdmin() {
       return Alert.alert("Error", "Completa todos los campos");
     }
     try {
-      await api.put(`/subcategorias/editar/${id_subcategoria}`, editForm);
+      await API.put(`/subcategorias/editar/${id_subcategoria}`, editForm); // 🔹 cambiado api -> API
       setShowEditModal(false);
       await cargarSubcategorias();
     } catch (err) {
