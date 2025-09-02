@@ -1,0 +1,11 @@
+.carrusel-contenedor {
+  width: 100%;
+  max-width: 2400px;
+}
+
+.carousel-image {
+  height: 450px; /* Ajusta la altura aquí */
+  object-fit: cover;
+  border-radius: px;
+}
+
