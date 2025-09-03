@@ -3,6 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
+
+
 const getBaseURL = () => {
     if (process.env.BACKEND_URL) {
         return process.env.BACKEND_URL;
