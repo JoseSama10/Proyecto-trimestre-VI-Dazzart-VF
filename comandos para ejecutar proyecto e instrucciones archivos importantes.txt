@@ -1,0 +1,30 @@
+comando ejecución proyecto jame (movil)
+- correr el sql de jame que les entrego
+- pararse en la carpeta movil
+comando: npx expo start ( si no funciona correctamente puede deverse a que falta utilizar el comando npm i)
+
+
+ejecución proyecto dazzart (instalar aplicativo expo go en Android): https://expo.dev/go
+comandos funcionamiento normal expo go: 
+npm i
+npx expo start
+comandos si da problemas que peuden ser útiles :
+npm install --global expo-cli
+expo install
+npx expo start -c ( este comando limpia el cache)
+
+
+complemento:
+npm install @react-native-async-storage/async-storage
+
+
+
+
+
+archivos importantes:
+
+backend/index.js (modificado para que la app pueda ser desarrollada en cualquier computador con cualquier ip local y no con una establecida o fija esta va de la mano de api.js) notas: no modificar
+ móvil config/api.js conector entre la app móvil React Native y el  backend (Node.js/Express) si esta no hay comunicacio nentre la carpeta backend y la de móviles(móvil).
+notas: no modificar
+stacknavigator: flujo de pantallas screen (modificar a medida que se desarrolle el proyecto)
+app.js: muestra lo que este en el stacknavigator 
