@@ -121,5 +121,4 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
   );
 };
 
-
 export default ProductosList;
