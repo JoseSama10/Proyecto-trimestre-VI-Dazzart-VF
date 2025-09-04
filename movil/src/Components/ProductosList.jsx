@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import API from '../config/api';
@@ -11,10 +12,12 @@ const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons }) =
     imgUrl = `${API.defaults.baseURL.replace(/\/api$/, '')}/productos/img/${imgUrl}`;
   }
 
+  const navigation = useNavigation();
   return (
     <TouchableOpacity
       activeOpacity={0.95}
       style={styles.card}
+      onPress={() => navigation.navigate('DetalleProducto', { producto })}
     >
       <View style={styles.imageContainer}>
         {imgUrl ? (

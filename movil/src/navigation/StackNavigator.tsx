@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AdminCrud from '../screens/admin/AdminCrud';
 import Index from '../index';
 import CarritoScreen from '../screens/cliente/CarritoScreen';
+import DetalleProducto from '../screens/cliente/DetalleProducto';
 
 
 const Stack = createNativeStackNavigator();
@@ -31,6 +32,11 @@ export default function StackNavigator() {
       <Stack.Screen
         name="Carrito"
         component={CarritoScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DetalleProducto"
+        component={DetalleProducto}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
