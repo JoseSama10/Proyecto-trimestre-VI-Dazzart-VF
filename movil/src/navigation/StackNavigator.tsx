@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Index from '../index';
 import CarritoScreen from '../screens/cliente/CarritoScreen';
 import Register from '../screens/cliente/Registro';
-import Login from '../screens/cliente/Login';
+
 
 // ADMIN
 import Categorias from '../screens/admin/categorias';
@@ -28,7 +28,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Categorias">
+    <Stack.Navigator initialRouteName="Index">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -44,12 +44,7 @@ export default function StackNavigator() {
         component={Register}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{ headerShown: false }}
-      />
-
+    
       <Stack.Screen
         name="Categorias"
         component={Categorias}
