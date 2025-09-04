@@ -85,7 +85,7 @@ const RegistroDazzart = ({ navigation }) => {
 
   return (
     <ImageBackground
-      source={require("../../assets/BANNER_MI_PC_4.jpg")}
+      source={require("../../assets/pcwallpaper.jpg")}
       style={styles.background}
     >
       <ScrollView contentContainerStyle={styles.container}>
