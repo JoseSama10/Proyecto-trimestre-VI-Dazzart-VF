@@ -28,7 +28,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Index">
+    <Stack.Navigator initialRouteName="Register">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -60,8 +60,7 @@ export default function StackNavigator() {
         component={Estadisticas}
         options={{ title: 'Estadísticas' }}
       />
-    
-
+  
     </Stack.Navigator>
   );
 }

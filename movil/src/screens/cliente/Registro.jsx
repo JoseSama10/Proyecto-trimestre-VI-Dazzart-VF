@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Modal } from "react-native";
 import {
   View,
   Text,
@@ -7,298 +8,216 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+  ImageBackground,
+} from "react-native";
+import API from "../../config/api"; 
 
-export default function Registro({ navigation }) {
+const RegistroDazzart = ({ navigation }) => {
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    email: '',
-    telefono: '',
-    password: '',
-    confirmPassword: '',
+    nombre: "",
+    usuario: "",
+    cedula: "",
+    email: "",
+    password: "",
+    telefono: "",
+    direccion: "",
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const validate = () => {
+    let valid = true;
+    let newErrors = {};
+
+    if (!formData.nombre.trim()) {
+      newErrors.nombre = "El nombre es obligatorio";
+      valid = false;
+    }
+    if (!formData.usuario.trim()) {
+      newErrors.usuario = "El usuario es obligatorio";
+      valid = false;
+    }
+    if (!formData.cedula.trim()) {
+      newErrors.cedula = "La cédula es obligatoria";
+      valid = false;
+    }
+    if (!formData.email.includes("@")) {
+      newErrors.email = "Correo inválido";
+      valid = false;
+    }
+    if (formData.password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      valid = false;
+    }
+    if (!formData.telefono.trim()) {
+      newErrors.telefono = "El teléfono es obligatorio";
+      valid = false;
+    }
+    if (!formData.direccion.trim()) {
+      newErrors.direccion = "La dirección es obligatoria";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
-  const handleRegistro = () => {
-    // Validaciones básicas
-    if (!formData.nombre || !formData.apellido || !formData.email || !formData.password) {
-      Alert.alert('Error', 'Por favor completa todos los campos obligatorios');
-      return;
-    }
+  const handleSubmit = async () => {
+    if (!validate()) return;
 
-    if (formData.password !== formData.confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden');
-      return;
+    try {
+      await API.post("/usuarios/register", {
+        nombre: formData.nombre,
+        nombre_usuario: formData.usuario,
+        correo_electronico: formData.email,
+        telefono: formData.telefono,
+        contrasena: formData.password,
+        cedula: formData.cedula,
+        direccion: formData.direccion,
+      });
+      setModalVisible(true);
+    } catch (error) {
+      console.error("Error al registrar:", error);
+      Alert.alert("Error", "No se pudo registrar el usuario");
     }
-
-    if (formData.password.length < 6) {
-      Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    // Simular registro exitoso
-    Alert.alert(
-      'Registro Exitoso',
-      `¡Bienvenido ${formData.nombre}!\n\nDatos registrados:\n• Email: ${formData.email}\n• Teléfono: ${formData.telefono}`,
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            // Limpiar formulario
-            setFormData({
-              nombre: '',
-              apellido: '',
-              email: '',
-              telefono: '',
-              password: '',
-              confirmPassword: '',
-            });
-            // Opcional: navegar a otra pantalla
-            // navigation.navigate('Login');
-          }
-        }
-      ]
-    );
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <ImageBackground
+      source={require("../../assets/BANNER_MI_PC_4.jpg")}
+      style={styles.background}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Crear Cuenta</Text>
-          <Text style={styles.subtitle}>Completa tus datos para registrarte</Text>
-        </View>
-
-        <View style={styles.form}>
-          {/* Nombre */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Nombre *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu nombre"
-              value={formData.nombre}
-              onChangeText={(value) => handleInputChange('nombre', value)}
-              autoCapitalize="words"
-            />
-          </View>
-
-          {/* Apellido */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Apellido *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingresa tu apellido"
-              value={formData.apellido}
-              onChangeText={(value) => handleInputChange('apellido', value)}
-              autoCapitalize="words"
-            />
-          </View>
-
-          {/* Email */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="ejemplo@correo.com"
-              value={formData.email}
-              onChangeText={(value) => handleInputChange('email', value)}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-
-          {/* Teléfono */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Teléfono</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="123-456-7890"
-              value={formData.telefono}
-              onChangeText={(value) => handleInputChange('telefono', value)}
-              keyboardType="phone-pad"
-            />
-          </View>
-
-          {/* Contraseña */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Contraseña *</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Mínimo 6 caracteres"
-                value={formData.password}
-                onChangeText={(value) => handleInputChange('password', value)}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={24}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Confirmar Contraseña */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Confirmar Contraseña *</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                placeholder="Repite tu contraseña"
-                value={formData.confirmPassword}
-                onChangeText={(value) => handleInputChange('confirmPassword', value)}
-                secureTextEntry={!showConfirmPassword}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <Ionicons
-                  name={showConfirmPassword ? 'eye-off' : 'eye'}
-                  size={24}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Botón de Registro */}
-          <TouchableOpacity style={styles.registerButton} onPress={handleRegistro}>
-            <Text style={styles.registerButtonText}>Registrarse</Text>
-          </TouchableOpacity>
-
-          {/* Link para Login */}
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>¿Ya tienes cuenta? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLink}>Inicia Sesión</Text>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Registro</Text>
+        {/* ...inputs y botón igual... */}
+        <TextInput
+          style={[styles.input, errors.nombre && styles.errorInput]}
+          placeholder="Nombre"
+          value={formData.nombre}
+          onChangeText={(text) => setFormData({ ...formData, nombre: text })}
+        />
+        {errors.nombre && <Text style={styles.errorText}>{errors.nombre}</Text>}
+        <TextInput
+          style={[styles.input, errors.usuario && styles.errorInput]}
+          placeholder="Usuario"
+          value={formData.usuario}
+          onChangeText={(text) => setFormData({ ...formData, usuario: text })}
+        />
+        {errors.usuario && <Text style={styles.errorText}>{errors.usuario}</Text>}
+        <TextInput
+          style={[styles.input, errors.cedula && styles.errorInput]}
+          placeholder="Cédula"
+          value={formData.cedula}
+          onChangeText={(text) => setFormData({ ...formData, cedula: text })}
+        />
+        {errors.cedula && <Text style={styles.errorText}>{errors.cedula}</Text>}
+        <TextInput
+          style={[styles.input, errors.email && styles.errorInput]}
+          placeholder="Correo electrónico"
+          value={formData.email}
+          onChangeText={(text) => setFormData({ ...formData, email: text })}
+          keyboardType="email-address"
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+        <TextInput
+          style={[styles.input, errors.password && styles.errorInput]}
+          placeholder="Contraseña"
+          value={formData.password}
+          onChangeText={(text) => setFormData({ ...formData, password: text })}
+          secureTextEntry
+        />
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+        <TextInput
+          style={[styles.input, errors.telefono && styles.errorInput]}
+          placeholder="Teléfono"
+          value={formData.telefono}
+          onChangeText={(text) => setFormData({ ...formData, telefono: text })}
+          keyboardType="phone-pad"
+        />
+        {errors.telefono && <Text style={styles.errorText}>{errors.telefono}</Text>}
+        <TextInput
+          style={[styles.input, errors.direccion && styles.errorInput]}
+          placeholder="Dirección"
+          value={formData.direccion}
+          onChangeText={(text) => setFormData({ ...formData, direccion: text })}
+        />
+        {errors.direccion && <Text style={styles.errorText}>{errors.direccion}</Text>}
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
+      </ScrollView>
+      {/* Modal de registro correcto */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 28, alignItems: 'center', width: 280 }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#00bfa5', marginBottom: 12 }}>¡Registro exitoso!</Text>
+            <Text style={{ fontSize: 16, color: '#222', marginBottom: 18, textAlign: 'center' }}>Tu usuario ha sido creado correctamente.</Text>
+            <TouchableOpacity
+              style={{ backgroundColor: '#00bfa5', paddingVertical: 10, paddingHorizontal: 24, borderRadius: 8 }}
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('Index');
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Ir al inicio</Text>
             </TouchableOpacity>
           </View>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </Modal>
+    </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    resizeMode: "cover", 
   },
-  scrollContainer: {
+  container: {
     flexGrow: 1,
     padding: 20,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-    marginTop: 20,
-  },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-  },
-  form: {
-    flex: 1,
-  },
-  inputContainer: {
+    fontSize: 24,
+    textAlign: "center",
     marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    fontWeight: "bold",
+    color: "#fff", 
   },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ccc",
     borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    color: '#333',
+    padding: 10,
+    marginBottom: 20,
+    backgroundColor: "rgba(255,255,255,0.9)", 
+    width: "100%",
   },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
+  button: {
+    backgroundColor: "#00ffff",
+    padding: 15,
     borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
   },
-  passwordInput: {
-    flex: 1,
-    padding: 15,
+  buttonText: {
+    color: "#000",
+    fontWeight: "bold",
     fontSize: 16,
-    color: '#333',
   },
-  eyeIcon: {
-    padding: 15,
+  errorText: {
+    color: "red",
+    marginBottom: 8,
   },
-  registerButton: {
-    backgroundColor: '#007bff',
-    borderRadius: 10,
-    padding: 18,
-    alignItems: 'center',
-    marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  registerButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 30,
-  },
-  loginText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  loginLink: {
-    fontSize: 16,
-    color: '#007bff',
-    fontWeight: '600',
+  errorInput: {
+    borderColor: "red",
   },
 });
+
+export default RegistroDazzart;
