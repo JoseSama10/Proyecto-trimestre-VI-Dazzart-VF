@@ -37,7 +37,7 @@ export default function CategoriasAdmin() {
   const cargarCategorias = async () => {
     setRefreshing(true);
     try {
-      const res = await API.get("/categorias/listar"); // 🔹 cambiado api -> API
+      const res = await API.get("/categorias/listar"); 
       const categoriasMapeadas = Array.isArray(res.data)
         ? res.data.map((cat) => ({
             id_categoria: cat.id_categoria || cat.id,

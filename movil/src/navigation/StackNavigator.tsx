@@ -8,9 +8,9 @@ import Register from '../screens/cliente/Registro';
 import Login from '../screens/cliente/Login';
 
 // ADMIN
-import AdminCrud from '../screens/admin/AdminCrud';
 import Categorias from '../screens/admin/categorias';
 import Subcategorias from '../screens/admin/subcategorias';
+import Estadisticas from '../screens/admin/estadisticas';
 
 // Tipado de rutas
 export type RootStackParamList = {
@@ -21,13 +21,14 @@ export type RootStackParamList = {
   AdminCrud: undefined;
   Categorias: undefined;
   Subcategorias: undefined; 
+  Estadisticas: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Index">
+    <Stack.Navigator initialRouteName="Categorias">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -48,11 +49,7 @@ export default function StackNavigator() {
         component={Login}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="AdminCrud"
-        component={AdminCrud}
-        options={{ headerShown: false }}
-      />
+
       <Stack.Screen
         name="Categorias"
         component={Categorias}
@@ -63,6 +60,12 @@ export default function StackNavigator() {
         component={Subcategorias}
         options={{ title: 'Subcategorías' }}
       />
+     <Stack.Screen
+        name="Estadisticas"
+        component={Estadisticas}
+        options={{ title: 'Estadísticas' }}
+      />
+    
 
     </Stack.Navigator>
   );

@@ -22,9 +22,7 @@ const Index = () => {
   const [carrito, setCarrito] = useState([]);
   const [modalAgregadoVisible, setModalAgregadoVisible] = useState(false);
   const [perfilDropdownVisible, setPerfilDropdownVisible] = useState(false);
-// ...existing code...
 
-  // HANDLER PARA AGREGAR PRODUCTO AL CARRITO
   const handleAgregarCarrito = async (producto, cantidad = 1) => {
     if (!usuario) {
       setLoginVisible(true);
@@ -191,6 +189,13 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+    carruselContainer: {
+    height: 260, 
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
 });
 
