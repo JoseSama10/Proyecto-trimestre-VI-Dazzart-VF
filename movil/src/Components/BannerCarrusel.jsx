@@ -53,11 +53,12 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: 'center',
     justifyContent: 'center',
+    height: 180, // alto fijo para todas las imágenes
   },
   image: {
     width: '100%',
-    height: 200,
-    resizeMode: 'contain',
+    height: 180, // igual al slide
+    resizeMode: 'cover', // recorta igual todas
     borderRadius: 12,
   },
 });
