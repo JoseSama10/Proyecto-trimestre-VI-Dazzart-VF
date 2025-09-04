@@ -126,7 +126,7 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 							onBoton={() => {
 								setShowBienvenida(false);
 								onClose && onClose();
-								navigation.replace('AdminCrud');
+								navigation.replace('Categorias');
 							}}
 							showClose={false}
 						/>
