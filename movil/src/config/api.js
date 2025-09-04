@@ -34,7 +34,7 @@ API.interceptors.request.use(async (config) => {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
-    } catch (error) {
+    } catch (_error) {
         return null;
     }
 

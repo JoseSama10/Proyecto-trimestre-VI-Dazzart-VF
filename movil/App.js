@@ -13,6 +13,7 @@ LogBox.ignoreLogs([
 
 SplashScreen.preventAutoHideAsync();
 
+
 export default function App() {
 
   let [fontsLoaded] = useFonts({

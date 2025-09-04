@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import API from './config/api';
-import { Text, View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Header from './components/Header';
-import ModalLogin from './components/ModalLogin';
-import ModalFeedback from './components/ModalFeedback';
-import Footer from './components/Footer';
-import Marcas from './components/Marcas';
-import BannerCarrusel from './components/BannerCarrusel';
-import ProductosList from './components/ProductosList';
-import MenuLateral from './components/MenuLateral';
-import PerfilDropdown from './components/PerfilDropdown';
+
+
+import Header from './Components/Header';
+import ModalLogin from './Components/ModalLogin';
+import ModalFeedback from './Components/ModalFeedback';
+import Footer from './Components/Footer';
+import Marcas from './Components/Marcas';
+import BannerCarrusel from './Components/BannerCarrusel';
+import ProductosList from './Components/ProductosList';
+import MenuLateral from './Components/MenuLateral';
+import PerfilDropdown from './Components/PerfilDropdown';
 
 const Index = () => {
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
   const [loginVisible, setLoginVisible] = useState(false);
-  const [usuario, setUsuario] = useState(null);
-  const [modalNoAuthVisible, setModalNoAuthVisible] = useState(false);
+  const [usuario, setUsuario] = useState(null);  
   const [carrito, setCarrito] = useState([]);
   const [modalAgregadoVisible, setModalAgregadoVisible] = useState(false);
   const [perfilDropdownVisible, setPerfilDropdownVisible] = useState(false);
+// ...existing code...
 
   // HANDLER PARA AGREGAR PRODUCTO AL CARRITO
   const handleAgregarCarrito = async (producto, cantidad = 1) => {
@@ -37,7 +39,9 @@ const Index = () => {
       // RECARGAR CARRITO ACTUALIZADO
       const res = await API.get(`/carrito/${usuario.id_usuario}`);
       setCarrito(res.data || []);
-    } catch (e) {}
+    } catch {
+      // Error manejado silenciosamente
+    }
     setModalAgregadoVisible(true);
   };
 
@@ -48,14 +52,13 @@ const Index = () => {
       try {
         const res = await API.get(`/carrito/${user.id_usuario}`);
         setCarrito(res.data || []);
-      } catch (err) {
+      } catch {
         setCarrito([]);
       }
     } else {
       setCarrito([]);
     }
   };
-
 
   // HANDLER PARA ELIMINAR PRODUCTO DEL CARRITO
   const handleRemoveCarrito = async (producto) => {
@@ -68,7 +71,9 @@ const Index = () => {
         // RECARGAR CARRITO ACTUALIZADO
         const res = await API.get(`/carrito/${usuario.id_usuario}`);
         setCarrito(res.data || []);
-      } catch (e) {}
+      } catch {
+        // Error manejado silenciosamente
+      }
     } else {
       setCarrito((prev) => prev.filter((p) => getId(p) !== idProd));
     }

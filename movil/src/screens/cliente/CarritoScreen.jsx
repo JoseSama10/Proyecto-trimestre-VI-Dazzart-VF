@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import ModalFeedback from '../../components/ModalFeedback';
+import ModalFeedback from '../../Components/ModalFeedback';
 import API from '../../config/api';
 import { FontAwesome } from '@expo/vector-icons';
 

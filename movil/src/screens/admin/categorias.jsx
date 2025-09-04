@@ -11,7 +11,7 @@ import {
   SafeAreaView,
   RefreshControl,
 } from "react-native";
-import API from "../../config/api";  // 🔹 corregido
+import API from "../../config/api"; 
 import MenuLateral from "../../Components/Admin/MenuLateral";
 import Icon from "react-native-vector-icons/FontAwesome6";
 import { useFocusEffect } from "@react-navigation/native";
