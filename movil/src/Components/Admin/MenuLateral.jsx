@@ -1,3 +1,5 @@
+// Se eliminó la pantalla de Login y ahora el botón 'Salir' redirige al Index.
+// Cambios para navegación directa al Index desde el menú lateral.
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome6";
@@ -7,6 +9,7 @@ export default function MenuLateral() {
   const [openConfig, setOpenConfig] = useState(false);
   const navigation = useNavigation();
 
+  // Al presionar 'Salir', se navega al Index en vez de Login
   const handleLogout = () => {
     // Aquí puedes limpiar AsyncStorage o lo que uses para sesión
     Alert.alert("Salir", "¿Deseas cerrar sesión?", [
@@ -16,7 +19,8 @@ export default function MenuLateral() {
         style: "destructive",
         onPress: () => {
           // Limpia sesión aquí
-          navigation.replace("Login");
+          // Redirección al Index (login eliminado)
+          navigation.replace("Index");
         },
       },
     ]);
