@@ -56,6 +56,11 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
   const [loading, setLoading] = useState(true);
   const [showIcons, setShowIcons] = useState(false);
   const hideIconsTimeout = React.useRef(null);
+  const flatListRef = React.useRef(null);
+  // Para loop infinito, duplicamos los productos
+  const loopedProductos = productos.length > 0 ? [...productos, ...productos, ...productos] : [];
+  // El índice central para empezar en el "medio" del loop
+  const middleIndex = productos.length;
 
   useEffect(() => {
     API.get('/productos/listar')
@@ -73,6 +78,12 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
         }
         setProductos(arr);
         setLoading(false);
+        // Al cargar, saltar al centro del loop
+        setTimeout(() => {
+          if (flatListRef.current && arr.length > 0) {
+            flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
+          }
+        }, 300);
       })
       .catch(() => setLoading(false));
   }, []);
@@ -88,8 +99,9 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
         Nuevos Productos
       </Text>
       <FlatList
-        data={productos}
-        keyExtractor={item => item._id?.toString() || item.id?.toString() || Math.random().toString()}
+        ref={flatListRef}
+        data={loopedProductos}
+        keyExtractor={(_, idx) => idx.toString()}
         renderItem={({ item }) => (
           <ProductoCard
             producto={item}
@@ -102,19 +114,32 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
         style={{ minHeight: 360 }}
+        initialScrollIndex={middleIndex}
+  getItemLayout={(_, index) => ({ length: 160, offset: 160 * index, index })}
         onScrollBeginDrag={() => {
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }
           setShowIcons(true);
         }}
-        onScrollEndDrag={() => {
+        onScrollEndDrag={event => {
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }
           hideIconsTimeout.current = setTimeout(() => {
             setShowIcons(false);
           }, 950);
+          // Loop infinito: si llegas al final/inicio, saltar al centro
+          const offsetX = event.nativeEvent.contentOffset.x;
+          const itemWidth = 220; // Ajusta según el ancho de la card
+          const totalItems = loopedProductos.length;
+          if (flatListRef.current && productos.length > 0) {
+            if (offsetX <= itemWidth) {
+              flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
+            } else if (offsetX >= itemWidth * (totalItems - productos.length - 1)) {
+              flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
+            }
+          }
         }}
       />
     </View>
