@@ -11,6 +11,9 @@ import Register from '../screens/cliente/Registro';
 import Categorias from '../screens/admin/categorias';
 import Subcategorias from '../screens/admin/subcategorias';
 import Estadisticas from '../screens/admin/estadisticas';
+import Productos from '../screens/admin/productos';
+import AgregarProductoScreen from '../screens/admin/AgregarProducto';
+import EditarProductoScreen from '../screens/admin/EditarProducto.jsx';
 
 // Tipado de rutas
 export type RootStackParamList = {
@@ -22,13 +25,16 @@ export type RootStackParamList = {
   Categorias: undefined;
   Subcategorias: undefined; 
   Estadisticas: undefined;
+  Productos: undefined;
+  AgregarProducto: undefined;
+  EditarProducto: { id: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Index">
+    <Stack.Navigator initialRouteName="Productos">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -60,7 +66,17 @@ export default function StackNavigator() {
         component={Estadisticas}
         options={{ title: 'Estadísticas' }}
       />
-  
+
+
+      {/* Pantallas de productos */}
+      <Stack.Screen
+        name="Productos"
+        component={Productos}
+        options={{ title: 'Productos' }}
+      />
+      <Stack.Screen name="AgregarProducto" component={AgregarProductoScreen} />
+      <Stack.Screen name="EditarProducto" component={EditarProductoScreen} />
+    
     </Stack.Navigator>
   );
 }

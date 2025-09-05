@@ -5,37 +5,36 @@ import StackNavigator from './src/navigation/StackNavigator';
 import * as SplashScreen from 'expo-splash-screen'; 
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins'; 
 
-
+// Ignorar advertencias específicas
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews',
 ]);
 
-
+// Mantener splash screen hasta que las fuentes carguen
 SplashScreen.preventAutoHideAsync();
 
-
 export default function App() {
-
-  let [fontsLoaded] = useFonts({
+  // Cargar fuentes
+  const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_700Bold,
   });
 
- 
+  // Ocultar splash cuando las fuentes estén listas
   const onLayoutRootView = async () => {
     if (fontsLoaded) {
-      await SplashScreen.hideAsync(); 
+      await SplashScreen.hideAsync();
     }
   };
 
   if (!fontsLoaded) {
-    return null; 
+    return null; // Mostrar pantalla en blanco mientras cargan fuentes
   }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <NavigationContainer>
-  <StackNavigator />
+        <StackNavigator />
       </NavigationContainer>
     </GestureHandlerRootView>
   );
