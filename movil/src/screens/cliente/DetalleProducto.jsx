@@ -69,7 +69,7 @@ export default function DetalleProducto() {
                             navigation.navigate('Carrito', { usuario });
                         }
                     }}
-                    onSearch={() => navigation.navigate('Index')}
+                    onSearch={() => navigation.navigate('Index', { usuario })}
                 />
                 
                 <PerfilDropdown
