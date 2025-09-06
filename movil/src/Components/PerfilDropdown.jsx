@@ -8,8 +8,8 @@ const PerfilDropdown = ({ visible, usuario, onLogout, onMisCompras, onMisDatos }
   return (
     <View style={{
       position: 'absolute',
-      top: 60,
-      right: 20,
+  top: 100, // MAS ABAJO DEL HEADER PARA MEJOR SEPARACIoN VISUAL
+      right: 16, //  ALINEADO A LA DERECHA CON EL ICONO DE USUARIO
       zIndex: 100,
       backgroundColor: '#fff',
       borderRadius: 18,
