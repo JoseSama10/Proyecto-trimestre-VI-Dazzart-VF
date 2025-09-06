@@ -14,7 +14,7 @@ const MenuLateral = ({ visible, onClose, onSelectSubcategoria }) => {
       API.get('/categorias/listar')
         .then(res => setCategorias(res.data))
         .catch(() => setCategorias([]));
-      setCategoriaActiva(null); 
+      setCategoriaActiva(null);
       setSubcategorias([]);
     }
   }, [visible]);
@@ -31,6 +31,15 @@ const MenuLateral = ({ visible, onClose, onSelectSubcategoria }) => {
       setSubcategorias([]);
     }
   }, [categoriaActiva]);
+
+  const handleCategoriaClick = (id) => {
+    setCategoriaActiva(id);
+  };
+
+  const handleSubcategoriaClick = (id_subcategoria) => {
+    if (onSelectSubcategoria) onSelectSubcategoria(categoriaActiva, id_subcategoria);
+    onClose();
+  };
 
   if (!visible) return null;
   return (
@@ -50,7 +59,7 @@ const MenuLateral = ({ visible, onClose, onSelectSubcategoria }) => {
                 <TouchableOpacity
                   key={cat.id_categoria}
                   style={styles.categoriaBtn}
-                  onPress={() => setCategoriaActiva(cat.id_categoria)}
+                  onPress={() => handleCategoriaClick(cat.id_categoria)}
                 >
                   <Text style={styles.categoriaText}>{cat.nombre_categoria}</Text>
                 </TouchableOpacity>
@@ -67,10 +76,7 @@ const MenuLateral = ({ visible, onClose, onSelectSubcategoria }) => {
                   <TouchableOpacity
                     key={sub.id_subcategoria}
                     style={styles.subcategoriaBtn}
-                    onPress={() => {
-                      if (onSelectSubcategoria) onSelectSubcategoria(categoriaActiva, sub.id_subcategoria);
-                      onClose();
-                    }}
+                    onPress={() => handleSubcategoriaClick(sub.id_subcategoria)}
                   >
                     <Text style={styles.subcategoriaText}>{sub.nombre_subcategoria}</Text>
                   </TouchableOpacity>

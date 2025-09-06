@@ -10,7 +10,7 @@ const CarritoScreen = ({ navigation, route }) => {
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [productosState, setProductosState] = useState([]);
 
-  // Al montar, hacer fetch del carrito del usuario
+  // AL MONTAR, HACER FETCH DEL CARRITO DEL USUARIO
   useEffect(() => {
     if (usuario && usuario.id_usuario) {
       API.get(`/carrito/${usuario.id_usuario}`)
@@ -41,7 +41,7 @@ const CarritoScreen = ({ navigation, route }) => {
       if (idCarrito) {
         API.delete(`/carrito/${idCarrito}`)
           .then(() => {
-            // Recargar productos del carrito
+            // RECARFAR CARRITO
             if (usuario && usuario.id_usuario) {
               API.get(`/carrito/${usuario.id_usuario}`)
                 .then(res => {

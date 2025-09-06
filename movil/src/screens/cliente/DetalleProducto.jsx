@@ -41,7 +41,7 @@ export default function DetalleProducto() {
                 id_producto: producto._id || producto.id || producto.id_producto,
                 cantidad: cantidad,
             });
-            setModalCarrito(true); // Mostrar modal de feedback
+            setModalCarrito(true); 
         } catch (e) {
             setMensajeModal('Error al agregar al carrito');
             setModalVisible(true);
@@ -71,7 +71,7 @@ export default function DetalleProducto() {
                     }}
                     onSearch={() => navigation.navigate('Index')}
                 />
-                {/* Dropdown de perfil si está logueado */}
+                
                 <PerfilDropdown
                     visible={showPerfil}
                     usuario={usuario}
@@ -89,7 +89,7 @@ export default function DetalleProducto() {
                         navigation.navigate('MisDatos', { usuario });
                     }}
                 />
-                {/* Menú lateral funcional */}
+                {/* MENU LATERAL*/}
                 <MenuLateral
                     visible={menuVisible}
                     onClose={() => setMenuVisible(false)}

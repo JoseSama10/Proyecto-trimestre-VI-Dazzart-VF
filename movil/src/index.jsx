@@ -38,7 +38,6 @@ const Index = () => {
       const res = await API.get(`/carrito/${usuario.id_usuario}`);
       setCarrito(res.data || []);
     } catch {
-      // Error manejado silenciosamente
     }
     setModalAgregadoVisible(true);
   };
@@ -70,7 +69,6 @@ const Index = () => {
         const res = await API.get(`/carrito/${usuario.id_usuario}`);
         setCarrito(res.data || []);
       } catch {
-        // Error manejado silenciosamente
       }
     } else {
       setCarrito((prev) => prev.filter((p) => getId(p) !== idProd));
