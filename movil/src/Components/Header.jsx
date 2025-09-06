@@ -15,7 +15,9 @@ const Header = ({ onMenuPress, onLoginPress, onCartPress, onSearch, usuario }) =
       </TouchableOpacity>
 
       {/* LOGO DAZZART */}
-      <Image source={logo} style={styles.logo} />
+      <TouchableOpacity onPress={onSearch} style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Image source={logo} style={styles.logo} />
+      </TouchableOpacity>
 
       {/* BARRA DE BUSQUEDA */}
       <View style={styles.iconGroup}>
