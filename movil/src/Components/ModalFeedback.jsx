@@ -26,39 +26,41 @@ const ModalFeedback = ({
   if (!visible) return null;
   return (
     <Modal visible={visible} animationType="fade" transparent>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={[styles.modalContainer, { backgroundColor: colorFondo }]}>  
-              {showClose && (
-                <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                  <Text style={{ fontSize: 22, color: '#888' }}>✖</Text>
+      <TouchableOpacity
+        activeOpacity={1}
+        style={styles.overlay}
+        onPress={onClose}
+      >
+        <TouchableWithoutFeedback>
+          <View style={[styles.modalContainer, { backgroundColor: colorFondo }]}>  
+            {showClose && (
+              <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+                <Text style={{ fontSize: 22, color: '#888' }}>✖</Text>
+              </TouchableOpacity>
+            )}
+            {/*ICONO DE CHECK AZUL */}
+            <MaterialIcons name="check" size={48} color="#0084ff" style={styles.iconCheck} />
+            <Text style={[styles.title, { color: colorTitulo }]}>{titulo}</Text>
+            <Text style={[styles.subtitle, { color: colorMensaje }]}>{mensaje}</Text>
+            <View style={styles.buttonRowVite}>
+              <TouchableOpacity
+                style={[styles.btnVite, styles.btnViteOutline]}
+                onPress={onBoton || onClose}
+              >
+                <Text style={styles.btnViteOutlineText}>{textoBoton || 'Cerrar'}</Text>
+              </TouchableOpacity>
+              {textoBotonSecundario && (
+                <TouchableOpacity
+                  style={[styles.btnVite, styles.btnViteSolid]}
+                  onPress={onBotonSecundario}
+                >
+                  <Text style={styles.btnViteSolidText}>{textoBotonSecundario}</Text>
                 </TouchableOpacity>
               )}
-              {/*ICONO DE CHECK AZUL */}
-              <MaterialIcons name="check" size={48} color="#0084ff" style={styles.iconCheck} />
-              <Text style={[styles.title, { color: colorTitulo }]}>{titulo}</Text>
-              <Text style={[styles.subtitle, { color: colorMensaje }]}>{mensaje}</Text>
-              <View style={styles.buttonRowVite}>
-                <TouchableOpacity
-                  style={[styles.btnVite, styles.btnViteOutline]}
-                  onPress={onBoton || onClose}
-                >
-                  <Text style={styles.btnViteOutlineText}>{textoBoton || 'Cerrar'}</Text>
-                </TouchableOpacity>
-                {textoBotonSecundario && (
-                  <TouchableOpacity
-                    style={[styles.btnVite, styles.btnViteSolid]}
-                    onPress={onBotonSecundario}
-                  >
-                    <Text style={styles.btnViteSolidText}>{textoBotonSecundario}</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
             </View>
-          </TouchableWithoutFeedback>
-        </View>
-      </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </Modal>
   );
 };
