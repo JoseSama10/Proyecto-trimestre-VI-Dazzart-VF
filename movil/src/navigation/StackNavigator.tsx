@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Index from '../index';
 import CarritoScreen from '../screens/cliente/CarritoScreen';
 import Register from '../screens/cliente/Registro';
-
+import DetalleProducto from '../screens/cliente/DetalleProducto';
 
 // ADMIN
 import Categorias from '../screens/admin/categorias';
@@ -28,13 +28,14 @@ export type RootStackParamList = {
   Productos: undefined;
   AgregarProducto: undefined;
   EditarProducto: { id: string };
+  DetalleProducto: { producto: any; usuario?: any };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Productos">
+    <Stack.Navigator initialRouteName="Index">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -48,6 +49,11 @@ export default function StackNavigator() {
       <Stack.Screen
         name="Register"
         component={Register}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DetalleProducto"
+        component={DetalleProducto}
         options={{ headerShown: false }}
       />
     
@@ -66,6 +72,7 @@ export default function StackNavigator() {
         component={Estadisticas}
         options={{ title: 'Estadísticas' }}
       />
+      
 
 
       {/* Pantallas de productos */}

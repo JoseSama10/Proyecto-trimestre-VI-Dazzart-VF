@@ -5,15 +5,21 @@ import API from '../../config/api';
 import { FontAwesome } from '@expo/vector-icons';
 
 const CarritoScreen = ({ navigation, route }) => {
-  const { productos = [], onRemove, onCheckout } = route.params || {};
+  const { usuario, onRemove, onCheckout } = route.params || {};
   const [modalEliminarVisible, setModalEliminarVisible] = useState(false);
   const [productoAEliminar, setProductoAEliminar] = useState(null);
-  const [productosState, setProductosState] = useState(productos);
+  const [productosState, setProductosState] = useState([]);
 
-  // SINCRONIZAR LOGICA DE PRODUCTOS
+  // Al montar, hacer fetch del carrito del usuario
   useEffect(() => {
-    setProductosState(productos);
-  }, [productos]);
+    if (usuario && usuario.id_usuario) {
+      API.get(`/carrito/${usuario.id_usuario}`)
+        .then(res => {
+          setProductosState(res.data || []);
+        })
+        .catch(() => setProductosState([]));
+    }
+  }, [usuario]);
   const subtotal = productosState.reduce((sum, p) => sum + (p.precio_final || p.precio || 0) * (p.cantidad || 1), 0);
   const envio = subtotal > 0 ? 0 : 0; 
   const pago = 'Pago ContraEntrega';
@@ -31,7 +37,22 @@ const CarritoScreen = ({ navigation, route }) => {
     if (productoAEliminar) {
       const getId = (p) => p._id || p.id || p.id_producto;
       const idProd = getId(productoAEliminar);
-      setProductosState((prev) => prev.filter((p) => getId(p) !== idProd));
+      const idCarrito = productoAEliminar.id_carrito;
+      if (idCarrito) {
+        API.delete(`/carrito/${idCarrito}`)
+          .then(() => {
+            // Recargar productos del carrito
+            if (usuario && usuario.id_usuario) {
+              API.get(`/carrito/${usuario.id_usuario}`)
+                .then(res => {
+                  setProductosState(res.data || []);
+                })
+                .catch(() => setProductosState([]));
+            }
+          });
+      } else {
+        setProductosState((prev) => prev.filter((p) => getId(p) !== idProd));
+      }
       if (onRemove) onRemove(productoAEliminar);
     }
     setModalEliminarVisible(false);
@@ -47,7 +68,7 @@ const CarritoScreen = ({ navigation, route }) => {
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={{ flexGrow: 1 }}>
       <Text style={styles.title}>Tu Carrito de Compras</Text>
-      {productos.length === 0 ? (
+      {productosState.length === 0 ? (
         <View style={{ alignItems: 'center', marginVertical: 30 }}>
           <FontAwesome name="shopping-cart" size={60} color="#aaa" />
           <Text style={{ color: '#888', marginTop: 10 }}>Tu carrito está vacío</Text>
@@ -124,7 +145,7 @@ const CarritoScreen = ({ navigation, route }) => {
               <Text style={styles.resumenLabelTotal}>Total:</Text>
               <Text style={styles.resumenValorTotal}>${total.toLocaleString('es-CO')}</Text>
             </View>
-            <TouchableOpacity style={styles.btnPedido} onPress={onCheckout} disabled={productos.length === 0}>
+            <TouchableOpacity style={styles.btnPedido} onPress={onCheckout} disabled={productosState.length === 0}>
               <Text style={styles.btnPedidoText}>Realizar Un Pedido</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnVolver} onPress={() => navigation.goBack()}>

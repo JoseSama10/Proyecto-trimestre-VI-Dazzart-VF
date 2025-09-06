@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import API from '../config/api';
 import styles from '../css/ProductosList';
 
-const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons }) => {
-  let imgUrl = producto?.imagen;
+const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons, onPress }) => {
+  let imgUrl = producto?.urlImagen || producto?.imagen;
   if (imgUrl && (imgUrl.startsWith('/img/') || imgUrl.startsWith('img/'))) {
     imgUrl = imgUrl.replace(/^\/?img\//, '');
     imgUrl = `${API.defaults.baseURL.replace(/\/api$/, '')}/productos/img/${imgUrl}`;
@@ -15,6 +16,7 @@ const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons }) =
     <TouchableOpacity
       activeOpacity={0.95}
       style={styles.card}
+      onPress={onPress}
     >
       <View style={styles.imageContainer}>
         {imgUrl ? (
@@ -52,21 +54,21 @@ const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons }) =
 };
 
 const ProductosList = ({ onAgregarCarrito, usuario }) => {
+  const navigation = useNavigation();
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showIcons, setShowIcons] = useState(false);
   const hideIconsTimeout = React.useRef(null);
   const flatListRef = React.useRef(null);
-  // Para loop infinito, duplicamos los productos
   const loopedProductos = productos.length > 0 ? [...productos, ...productos, ...productos] : [];
-  // El índice central para empezar en el "medio" del loop
+
   const middleIndex = productos.length;
 
   useEffect(() => {
     API.get('/productos/listar')
       .then(res => {
         // SE MUESTRAN SOLO MAS NUEVOS PRODUCTOS Y POR ID
-        let arr = res.data; 
+        let arr = res.data;
         if (arr && arr.length > 0) {
           arr = arr.sort((a, b) => {
             if (a.fecha_creacion && b.fecha_creacion) {
@@ -78,7 +80,6 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
         }
         setProductos(arr);
         setLoading(false);
-        // Al cargar, saltar al centro del loop
         setTimeout(() => {
           if (flatListRef.current && arr.length > 0) {
             flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
@@ -106,8 +107,9 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
           <ProductoCard
             producto={item}
             showIcons={showIcons}
-            onVerDetalle={() => {}}
+            onVerDetalle={() => { }}
             onAgregarCarrito={onAgregarCarrito}
+            onPress={() => navigation.navigate('DetalleProducto', { producto: item, usuario })}
           />
         )}
         horizontal={true}
@@ -115,7 +117,7 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
         contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
         style={{ minHeight: 360 }}
         initialScrollIndex={middleIndex}
-  getItemLayout={(_, index) => ({ length: 160, offset: 160 * index, index })}
+        getItemLayout={(_, index) => ({ length: 160, offset: 160 * index, index })}
         onScrollBeginDrag={() => {
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
@@ -129,9 +131,8 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
           hideIconsTimeout.current = setTimeout(() => {
             setShowIcons(false);
           }, 950);
-          // Loop infinito: si llegas al final/inicio, saltar al centro
           const offsetX = event.nativeEvent.contentOffset.x;
-          const itemWidth = 220; // Ajusta según el ancho de la card
+          const itemWidth = 220; // AJUSTA SEGUN EL ANCHO DE LA CARD
           const totalItems = loopedProductos.length;
           if (flatListRef.current && productos.length > 0) {
             if (offsetX <= itemWidth) {

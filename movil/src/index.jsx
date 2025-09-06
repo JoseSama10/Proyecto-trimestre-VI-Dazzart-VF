@@ -103,11 +103,7 @@ const Index = () => {
               setLoginVisible(true);
               return;
             }
-            navigation.navigate('Carrito', {
-              productos: carrito,
-              onRemove: handleRemoveCarrito,
-              onCheckout: handleCheckout,
-            });
+            navigation.navigate('Carrito', { usuario });
           }}
           usuario={usuario}
         />
@@ -132,11 +128,7 @@ const Index = () => {
           textoBotonSecundario="Ir al carrito"
           onBotonSecundario={() => {
             setModalAgregadoVisible(false);
-            navigation.navigate('Carrito', {
-              productos: carrito,
-              onRemove: handleRemoveCarrito,
-              onCheckout: handleCheckout,
-            });
+            navigation.navigate('Carrito', { usuario });
           }}
           showClose={true}
           onClose={() => setModalAgregadoVisible(false)}
