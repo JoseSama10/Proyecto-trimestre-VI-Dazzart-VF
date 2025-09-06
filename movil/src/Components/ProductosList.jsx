@@ -28,7 +28,7 @@ const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons, onP
         )}
         {showIcons && (
           <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', zIndex: 2 }}>
-            <TouchableOpacity onPress={onVerDetalle} style={{ marginHorizontal: 4 }}>
+            <TouchableOpacity onPress={() => onVerDetalle(producto)} style={{ marginHorizontal: 4 }}>
               <FontAwesome name="search" size={26} color="#444" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => onAgregarCarrito(producto)} style={{ marginHorizontal: 4 }}>
@@ -53,7 +53,7 @@ const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons, onP
   );
 };
 
-const ProductosList = ({ onAgregarCarrito, usuario }) => {
+const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
   const navigation = useNavigation();
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +108,7 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
           <ProductoCard
             producto={item}
             showIcons={showIcons}
-            onVerDetalle={() => { }}
+            onVerDetalle={onVerDetalle}
             onAgregarCarrito={onAgregarCarrito}
             onPress={() => navigation.navigate('DetalleProducto', { producto: item, usuario })}
           />
@@ -130,7 +130,7 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
           const itemWidth = 160;
           const totalItems = loopedProductos.length;
           const visibleItems = productos.length;
-          // Umbral más amplio para reposicionar (fluidez)
+          // UMBRAL MAS AMPLIO PARA REPOSICIONAR (FLUIDEZ)
           const threshold = itemWidth * visibleItems * 2;
           if (flatListRef.current && productos.length > 0) {
             if (offsetX <= threshold) {
@@ -139,7 +139,7 @@ const ProductosList = ({ onAgregarCarrito, usuario }) => {
               flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
             }
           }
-          // Oculta los iconos después de un tiempo
+          // OCULAR ICONOS DESPUES DE UN TIEMPO
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }
