@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import API from './config/api';
 import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 
 import Header from './Components/Header';
@@ -11,17 +11,21 @@ import Footer from './Components/Footer';
 import Marcas from './Components/Marcas';
 import BannerCarrusel from './Components/BannerCarrusel';
 import ProductosList from './Components/ProductosList';
+import ModalDetalleProducto from './Components/ModalDetalleProducto';
 import MenuLateral from './Components/MenuLateral';
 import PerfilDropdown from './Components/PerfilDropdown';
 
 const Index = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const [menuVisible, setMenuVisible] = useState(false);
   const [loginVisible, setLoginVisible] = useState(false);
-  const [usuario, setUsuario] = useState(null);  
+  const [usuario, setUsuario] = useState(route.params?.usuario || null);  
   const [carrito, setCarrito] = useState([]);
   const [modalAgregadoVisible, setModalAgregadoVisible] = useState(false);
   const [perfilDropdownVisible, setPerfilDropdownVisible] = useState(false);
+  const [modalDetalleVisible, setModalDetalleVisible] = useState(false);
+  const [productoDetalle, setProductoDetalle] = useState(null);
 
   const handleAgregarCarrito = async (producto, cantidad = 1) => {
     if (!usuario) {
@@ -105,6 +109,12 @@ const Index = () => {
           }}
           usuario={usuario}
         />
+        <ModalDetalleProducto
+          visible={modalDetalleVisible}
+          producto={productoDetalle}
+          onClose={() => setModalDetalleVisible(false)}
+          onAgregarCarrito={handleAgregarCarrito}
+        />
         <ModalLogin
           visible={loginVisible}
           onClose={() => setLoginVisible(false)}
@@ -133,7 +143,14 @@ const Index = () => {
         />
         <BannerCarrusel />
         <View style={styles.content}>
-          <ProductosList onAgregarCarrito={handleAgregarCarrito} usuario={usuario} />
+          <ProductosList
+            onAgregarCarrito={handleAgregarCarrito}
+            usuario={usuario}
+            onVerDetalle={producto => {
+              setProductoDetalle(producto);
+              setModalDetalleVisible(true);
+            }}
+          />
         </View>
         <Marcas />
         <SafeAreaView style={styles.safeFooter}>
