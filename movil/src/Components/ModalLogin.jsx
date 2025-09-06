@@ -57,8 +57,12 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 			<>
 				{/* MODAL PRINCIPAL DEL LOGIN */}
 				<Modal visible={visible} animationType="fade" transparent>
-					<View style={styles.overlay}>
-						<View style={styles.modalContainer}>
+					<TouchableOpacity
+						activeOpacity={1}
+						style={styles.overlay}
+						onPress={handleClose}
+					>
+						<View style={styles.modalContainer} pointerEvents="box-none">
 							<Text style={styles.title}>Iniciar Sesión</Text>
 
 							<View style={styles.inputGroup}>
@@ -107,7 +111,7 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 														</TouchableOpacity>
 							</View>
 						</View>
-					</View>
+					</TouchableOpacity>
 				</Modal>
 
 
