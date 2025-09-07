@@ -9,17 +9,27 @@ const CarritoScreen = ({ navigation, route }) => {
   const [modalEliminarVisible, setModalEliminarVisible] = useState(false);
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [productosState, setProductosState] = useState([]);
+  const [usuarioState, setUsuarioState] = useState(usuario);
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+      const userStr = await AsyncStorage.getItem('usuario');
+      if (userStr) setUsuarioState(JSON.parse(userStr));
+      else setUsuarioState(null);
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   // AL MONTAR, HACER FETCH DEL CARRITO DEL USUARIO
   useEffect(() => {
-    if (usuario && usuario.id_usuario) {
-      API.get(`/carrito/${usuario.id_usuario}`)
+    if (usuarioState && usuarioState.id_usuario) {
+      API.get(`/carrito/${usuarioState.id_usuario}`)
         .then(res => {
           setProductosState(res.data || []);
         })
         .catch(() => setProductosState([]));
     }
-  }, [usuario]);
+  }, [usuarioState]);
   const subtotal = productosState.reduce((sum, p) => sum + (p.precio_final || p.precio || 0) * (p.cantidad || 1), 0);
   const envio = subtotal > 0 ? 0 : 0; 
   const pago = 'Pago ContraEntrega';
@@ -41,9 +51,9 @@ const CarritoScreen = ({ navigation, route }) => {
       if (idCarrito) {
         API.delete(`/carrito/${idCarrito}`)
           .then(() => {
-            // RECARFAR CARRITO
-            if (usuario && usuario.id_usuario) {
-              API.get(`/carrito/${usuario.id_usuario}`)
+            // Refrescar el carrito después de eliminar
+            if (usuarioState && usuarioState.id_usuario) {
+              API.get(`/carrito/${usuarioState.id_usuario}`)
                 .then(res => {
                   setProductosState(res.data || []);
                 })
