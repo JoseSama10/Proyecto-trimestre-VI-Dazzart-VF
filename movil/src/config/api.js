@@ -3,6 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
+
+
 const getBaseURL = () => {
     if (process.env.BACKEND_URL) {
         return process.env.BACKEND_URL;
@@ -17,7 +19,11 @@ const getBaseURL = () => {
         return `http://${ip}:3001/api`;
     }
 
+    
+
     return 'http://localhost:3001/api';
+
+    
 };
 
 const API = axios.create({
@@ -32,7 +38,7 @@ API.interceptors.request.use(async (config) => {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
-    } catch (error) {
+    } catch (_error) {
         return null;
     }
 

@@ -1,39 +1,69 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-
-
+// CLIENTE
+import Index from '../index';
+import CarritoScreen from '../screens/cliente/CarritoScreen';
 import Register from '../screens/cliente/Registro';
-import Login from '../screens/cliente/Login';
+import DetalleProducto from '../screens/cliente/DetalleProducto';
+import VistaProductos from '../screens/VistaProductos';
 
 // ADMIN
 import Categorias from '../screens/admin/categorias';
 import Subcategorias from '../screens/admin/subcategorias';
+import Estadisticas from '../screens/admin/estadisticas';
+import Productos from '../screens/admin/productos';
+import AgregarProductoScreen from '../screens/admin/AgregarProducto';
+import EditarProductoScreen from '../screens/admin/EditarProducto.jsx';
 
 // Tipado de rutas
 export type RootStackParamList = {
+  Index: undefined;
+  Carrito: undefined;
   Register: undefined;
   Login: undefined;
+  AdminCrud: undefined;
   Categorias: undefined;
-  Subcategorias: { categoriaId: string }; 
+  Subcategorias: undefined; 
+  Estadisticas: undefined;
+  Productos: undefined;
+  AgregarProducto: undefined;
+  EditarProducto: { id: string };
+  DetalleProducto: { producto: any; usuario?: any };
+  VistaProductos: { id_categoria: number; id_subcategoria: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-
-<Stack.Navigator id={undefined} initialRouteName="Categorias">
+    <Stack.Navigator initialRouteName="Index">
+      <Stack.Screen
+        name="Index"
+        component={Index}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Carrito"
+        component={CarritoScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Register"
         component={Register}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Login"
-        component={Login}
+        name="DetalleProducto"
+        component={DetalleProducto}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="VistaProductos"
+        component={VistaProductos}
+        options={{ headerShown: false }}
+      />
+    
       <Stack.Screen
         name="Categorias"
         component={Categorias}
@@ -44,7 +74,23 @@ export default function StackNavigator() {
         component={Subcategorias}
         options={{ title: 'Subcategorías' }}
       />
+     <Stack.Screen
+        name="Estadisticas"
+        component={Estadisticas}
+        options={{ title: 'Estadísticas' }}
+      />
+      
 
+
+      {/* Pantallas de productos */}
+      <Stack.Screen
+        name="Productos"
+        component={Productos}
+        options={{ title: 'Productos' }}
+      />
+      <Stack.Screen name="AgregarProducto" component={AgregarProductoScreen} />
+      <Stack.Screen name="EditarProducto" component={EditarProductoScreen} />
+    
     </Stack.Navigator>
   );
 }

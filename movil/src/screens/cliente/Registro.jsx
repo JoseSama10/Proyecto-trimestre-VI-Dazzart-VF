@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Modal } from "react-native";
 import {
   View,
   Text,
@@ -23,6 +24,7 @@ const RegistroDazzart = ({ navigation }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
 
   const validate = () => {
     let valid = true;
@@ -74,9 +76,7 @@ const RegistroDazzart = ({ navigation }) => {
         cedula: formData.cedula,
         direccion: formData.direccion,
       });
-
-      Alert.alert("Éxito", "Usuario registrado con éxito");
-      navigation.navigate("Login");
+      setModalVisible(true);
     } catch (error) {
       console.error("Error al registrar:", error);
       Alert.alert("Error", "No se pudo registrar el usuario");
@@ -90,7 +90,7 @@ const RegistroDazzart = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Registro</Text>
-
+        {/* ...inputs y botón igual... */}
         <TextInput
           style={[styles.input, errors.nombre && styles.errorInput]}
           placeholder="Nombre"
@@ -98,7 +98,6 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, nombre: text })}
         />
         {errors.nombre && <Text style={styles.errorText}>{errors.nombre}</Text>}
-
         <TextInput
           style={[styles.input, errors.usuario && styles.errorInput]}
           placeholder="Usuario"
@@ -106,7 +105,6 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, usuario: text })}
         />
         {errors.usuario && <Text style={styles.errorText}>{errors.usuario}</Text>}
-
         <TextInput
           style={[styles.input, errors.cedula && styles.errorInput]}
           placeholder="Cédula"
@@ -114,7 +112,6 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, cedula: text })}
         />
         {errors.cedula && <Text style={styles.errorText}>{errors.cedula}</Text>}
-
         <TextInput
           style={[styles.input, errors.email && styles.errorInput]}
           placeholder="Correo electrónico"
@@ -123,7 +120,6 @@ const RegistroDazzart = ({ navigation }) => {
           keyboardType="email-address"
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-
         <TextInput
           style={[styles.input, errors.password && styles.errorInput]}
           placeholder="Contraseña"
@@ -132,7 +128,6 @@ const RegistroDazzart = ({ navigation }) => {
           secureTextEntry
         />
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-
         <TextInput
           style={[styles.input, errors.telefono && styles.errorInput]}
           placeholder="Teléfono"
@@ -141,7 +136,6 @@ const RegistroDazzart = ({ navigation }) => {
           keyboardType="phone-pad"
         />
         {errors.telefono && <Text style={styles.errorText}>{errors.telefono}</Text>}
-
         <TextInput
           style={[styles.input, errors.direccion && styles.errorInput]}
           placeholder="Dirección"
@@ -149,11 +143,33 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, direccion: text })}
         />
         {errors.direccion && <Text style={styles.errorText}>{errors.direccion}</Text>}
-
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Registrarse</Text>
         </TouchableOpacity>
       </ScrollView>
+      {/* Modal de registro correcto */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 28, alignItems: 'center', width: 280 }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#00bfa5', marginBottom: 12 }}>¡Registro exitoso!</Text>
+            <Text style={{ fontSize: 16, color: '#222', marginBottom: 18, textAlign: 'center' }}>Tu usuario ha sido creado correctamente.</Text>
+            <TouchableOpacity
+              style={{ backgroundColor: '#00bfa5', paddingVertical: 10, paddingHorizontal: 24, borderRadius: 8 }}
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('Index');
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Ir al inicio</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
