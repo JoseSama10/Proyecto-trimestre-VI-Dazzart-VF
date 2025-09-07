@@ -20,7 +20,16 @@ const Index = () => {
   const route = useRoute();
   const [menuVisible, setMenuVisible] = useState(false);
   const [loginVisible, setLoginVisible] = useState(false);
-  const [usuario, setUsuario] = useState(route.params?.usuario || null);  
+  const [usuario, setUsuario] = useState(null);
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+      const userStr = await AsyncStorage.getItem('usuario');
+      if (userStr) setUsuario(JSON.parse(userStr));
+      else setUsuario(null);
+    });
+    return unsubscribe;
+  }, [navigation]);
   const [carrito, setCarrito] = useState([]);
   const [modalAgregadoVisible, setModalAgregadoVisible] = useState(false);
   const [perfilDropdownVisible, setPerfilDropdownVisible] = useState(false);
@@ -160,11 +169,15 @@ const Index = () => {
         <PerfilDropdown
           visible={perfilDropdownVisible}
           usuario={usuario}
-          onLogout={() => {
+          onLogout={async () => {
+            const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+            await AsyncStorage.removeItem('usuario');
             setUsuario(null);
             setPerfilDropdownVisible(false);
-            // SE LIMPIAN LOS CAMOPOS AL CERRAR SESION
-            if (typeof global !== 'undefined' && global.clearLoginFields) global.clearLoginFields();
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Index' }],
+            });
           }}
           onMisCompras={() => {
             setPerfilDropdownVisible(false);
