@@ -6,6 +6,7 @@ import Index from '../index';
 import CarritoScreen from '../screens/cliente/CarritoScreen';
 import Register from '../screens/cliente/Registro';
 import DetalleProducto from '../screens/cliente/DetalleProducto';
+import VistaProductos from '../screens/VistaProductos';
 
 // ADMIN
 import Categorias from '../screens/admin/categorias';
@@ -29,6 +30,7 @@ export type RootStackParamList = {
   AgregarProducto: undefined;
   EditarProducto: { id: string };
   DetalleProducto: { producto: any; usuario?: any };
+  VistaProductos: { id_categoria: number; id_subcategoria: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -54,6 +56,11 @@ export default function StackNavigator() {
       <Stack.Screen
         name="DetalleProducto"
         component={DetalleProducto}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="VistaProductos"
+        component={VistaProductos}
         options={{ headerShown: false }}
       />
     
