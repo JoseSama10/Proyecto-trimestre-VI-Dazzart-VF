@@ -14,8 +14,17 @@ import MenuLateral from '../../Components/MenuLateral';
 export default function DetalleProducto() {
     const route = useRoute();
     const navigation = useNavigation();
-    const { producto, usuario: usuarioProp } = route.params || {};
-    const [usuario, setUsuario] = useState(usuarioProp);
+    const { producto } = route.params || {};
+    const [usuario, setUsuario] = useState(null);
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+            const userStr = await AsyncStorage.getItem('usuario');
+            if (userStr) setUsuario(JSON.parse(userStr));
+            else setUsuario(null);
+        });
+        return unsubscribe;
+    }, [navigation]);
     const [cantidad, setCantidad] = useState(1);
     const [dropdownCantidadVisible, setDropdownCantidadVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -23,7 +32,7 @@ export default function DetalleProducto() {
     const [modalCarrito, setModalCarrito] = useState(false);
 
     const { width } = useWindowDimensions();
-    const isLargeScreen = width > 600; 
+    const isLargeScreen = width > 600;
 
     const maxCantidad = producto.stock || 10;
     const [showLogin, setShowLogin] = useState(false);
@@ -41,7 +50,7 @@ export default function DetalleProducto() {
                 id_producto: producto._id || producto.id || producto.id_producto,
                 cantidad: cantidad,
             });
-            setModalCarrito(true); 
+            setModalCarrito(true);
         } catch (e) {
             setMensajeModal('Error al agregar al carrito');
             setModalVisible(true);
@@ -71,14 +80,20 @@ export default function DetalleProducto() {
                     }}
                     onSearch={() => navigation.navigate('Index', { usuario })}
                 />
-                
+
                 <PerfilDropdown
                     visible={showPerfil}
                     usuario={usuario}
-                    onLogout={() => {
+                    onLogout={async () => {
+                        const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+                        await AsyncStorage.removeItem('usuario');
                         setUsuario(null);
                         setShowPerfil(false);
-                        if (typeof global !== 'undefined' && global.clearLoginFields) global.clearLoginFields();
+                        // Forzar recarga visual y limpiar params
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Index' }],
+                        });
                     }}
                     onMisCompras={() => {
                         setShowPerfil(false);
@@ -93,9 +108,9 @@ export default function DetalleProducto() {
                 <MenuLateral
                     visible={menuVisible}
                     onClose={() => setMenuVisible(false)}
-                    onSelectSubcategoria={(subcat) => {
+                    onSelectSubcategoria={(catId, subcatId) => {
                         setMenuVisible(false);
-                        navigation.navigate('ProductosPorSubcategoria', { subcategoria: subcat });
+                        navigation.navigate('VistaProductos', { id_categoria: catId, id_subcategoria: subcatId });
                     }}
                 />
                 <ScrollView style={styles.container}>
@@ -131,8 +146,8 @@ export default function DetalleProducto() {
                                         )}
                                         {(producto.descuento_aplicado.tipo_descuento?.toLowerCase() === 'valor' ||
                                             producto.descuento_aplicado.tipo_descuento?.toLowerCase() === 'fijo') && (
-                                            <Text style={styles.badgeMobile}>-${producto.descuento_aplicado.valor}</Text>
-                                        )}
+                                                <Text style={styles.badgeMobile}>-${producto.descuento_aplicado.valor}</Text>
+                                            )}
                                     </>
                                 ) : (
                                     <Text style={styles.precioNormalMobile}>${producto.precio}</Text>
