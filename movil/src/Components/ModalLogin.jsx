@@ -27,22 +27,25 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 	}
 
 	const handleLogin = async () => {
-		try {
-			const res = await API.post('/login/login', {
-				correo_electronico: usuario.trim(),
-				contrasena: password.trim(),
-			});
-			const { user } = res.data;
-			onLogin && onLogin(user);
-			if (user.id_rol === 1) {
-				setShowBienvenida(true);
-			} else {
-				setNombreUsuario(user.nombre || user.nombre_usuario || user.correo_electronico || '');
-				setShowBienvenidaUsuario(true);
+			try {
+				const res = await API.post('/login/login', {
+					correo_electronico: usuario.trim(),
+					contrasena: password.trim(),
+				});
+				const { user } = res.data;
+				// Guardar usuario en AsyncStorage
+				const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+				await AsyncStorage.setItem('usuario', JSON.stringify(user));
+				onLogin && onLogin(user);
+				if (user.id_rol === 1) {
+					setShowBienvenida(true);
+				} else {
+					setNombreUsuario(user.nombre || user.nombre_usuario || user.correo_electronico || '');
+					setShowBienvenidaUsuario(true);
+				}
+			} catch (err) {
+				setShowErrorModal(true);
 			}
-		} catch (err) {
-			setShowErrorModal(true);
-		}
 	};
 
 		// LIMPIAR CAMPOS Y CERRAR MODAL
