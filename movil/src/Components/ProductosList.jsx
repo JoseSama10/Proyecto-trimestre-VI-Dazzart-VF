@@ -5,7 +5,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import API from '../config/api';
 import styles from '../css/ProductosList';
 
-const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons, onPress }) => {
+export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons, onPress }) => {
   let imgUrl = producto?.urlImagen || producto?.imagen;
   if (imgUrl && (imgUrl.startsWith('/img/') || imgUrl.startsWith('img/'))) {
     imgUrl = imgUrl.replace(/^\/?img\//, '');
@@ -61,7 +61,7 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
   const hideIconsTimeout = React.useRef(null);
   const flatListRef = React.useRef(null);
   // REPETIR EL ARRAY 7 VECES PARA MAYOR FLUIDEZ
-  const repeatCount = 70;
+  const repeatCount = 7;
   const loopedProductos = productos.length > 0 ? Array(repeatCount).fill(productos).flat() : [];
   const middleIndex = productos.length * Math.floor(repeatCount / 2);
 
