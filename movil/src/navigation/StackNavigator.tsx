@@ -15,6 +15,9 @@ import Estadisticas from '../screens/admin/estadisticas';
 import Productos from '../screens/admin/productos';
 import AgregarProductoScreen from '../screens/admin/AgregarProducto';
 import EditarProductoScreen from '../screens/admin/EditarProducto.jsx';
+import DescuentosAdmin from '../screens/admin/Descuento';
+import FormularioDescuento from '../screens/admin/FormularioDescuento';
+import EditarDescuento from '../screens/admin/EditarDescuento';
 
 // Tipado de rutas
 export type RootStackParamList = {
@@ -31,13 +34,16 @@ export type RootStackParamList = {
   EditarProducto: { id: string };
   DetalleProducto: { producto: any; usuario?: any };
   VistaProductos: { id_categoria: number; id_subcategoria: number };
+  Descuentos: undefined;
+  AgregarDescuento: undefined;
+  EditarDescuento: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Index">
+    <Stack.Navigator initialRouteName="Descuentos">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -91,6 +97,26 @@ export default function StackNavigator() {
       <Stack.Screen name="AgregarProducto" component={AgregarProductoScreen} />
       <Stack.Screen name="EditarProducto" component={EditarProductoScreen} />
     
+         <Stack.Screen
+        name= "Descuentos"
+        component={DescuentosAdmin}
+        options={{ title: 'Descuentos'}}
+      />
+
+       <Stack.Screen
+        name= "AgregarDescuento"
+        component={FormularioDescuento}
+        options={{ title: 'Formulario Descuento'}}
+      />
+      <Stack.Screen
+        name= "EditarDescuento"
+        component={EditarDescuento}
+        options={{ title: 'Editar Descuento'}}
+      />
+
+
+
+
     </Stack.Navigator>
   );
 }

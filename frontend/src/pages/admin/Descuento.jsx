@@ -8,8 +8,6 @@ import "../../css/CSSA/descuento.css";
 import Swal from "sweetalert2";
 import SidebarAdmin from "../../components/SideBarAdmin.jsx";
 import { useNavigate } from "react-router-dom";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function DescuentosAdmin() {
   const [descuentos, setDescuentos] = useState([]);
@@ -137,13 +135,13 @@ export default function DescuentosAdmin() {
             href={`/editar-descuento/${d.id_descuento}`}
             className="btn btn-success btn-sm"
           >
-            <FontAwesomeIcon icon={faEdit} /> Editar
+            Editar
           </a>
           <button
             className="btn btn-danger btn-sm"
             onClick={() => eliminarDescuento(d.id_descuento)}
           >
-            <FontAwesomeIcon icon={faTrash} /> Eliminar
+            Eliminar
           </button>
         </div>
       </td>
