@@ -1,10 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { Modal, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import styles from '../css/MenuLateral';
 import API from '../config/api';
 
 const MenuLateral = ({ visible, onClose, onSelectSubcategoria }) => {
+  const navigation = useNavigation();
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState(null);
@@ -38,6 +40,7 @@ const MenuLateral = ({ visible, onClose, onSelectSubcategoria }) => {
 
   const handleSubcategoriaClick = (id_subcategoria) => {
     if (onSelectSubcategoria) onSelectSubcategoria(categoriaActiva, id_subcategoria);
+    navigation.navigate('VistaProductos', { id_categoria: categoriaActiva, id_subcategoria });
     onClose();
   };
 
