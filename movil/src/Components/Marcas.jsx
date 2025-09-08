@@ -39,7 +39,7 @@ const marcasStyles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 8,
     width: '100%',
-    height: 120,
+    height: 75, 
     justifyContent: 'center',
     alignItems: 'center',
   },
