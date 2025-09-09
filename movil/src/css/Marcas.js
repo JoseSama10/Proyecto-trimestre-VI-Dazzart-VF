@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   section: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     paddingTop: 8,
     paddingBottom: 32,
     paddingHorizontal: 16,
