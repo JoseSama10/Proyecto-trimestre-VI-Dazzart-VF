@@ -1,3 +1,6 @@
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json');
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -37,7 +40,7 @@ const createApp = () => {
 
   // Ruta raíz
   app.get('/', (req, res) => {
-    res.send('Bienvenido a la API de DAZZART 🚀');
+    res.send('Bienvenido a la API de DAZZART ');
   });
 
   // API Routes (todas bajo /api)
@@ -53,6 +56,7 @@ const createApp = () => {
   // Imágenes estáticas
   app.use('/productos/img', express.static(path.join(__dirname, '../public/img')));
 
+   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   return app;
 };
 
