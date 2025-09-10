@@ -117,6 +117,11 @@ const Index = () => {
             navigation.navigate('Carrito', { usuario });
           }}
           usuario={usuario}
+          onSearch={(searchText) => {
+            if (searchText && searchText.trim().length > 0) {
+              navigation.navigate('VistaProductos', { search: searchText });
+            }
+          }}
         />
         <ModalDetalleProducto
           visible={modalDetalleVisible}
