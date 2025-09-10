@@ -5,20 +5,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "datatables.net-bs5";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import "../../css/CSSA/gestionusuarios.css";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Swal from 'sweetalert2';
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import SidebarAdmin from "../../components/SideBarAdmin";
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function UsuariosAdmin() {
   const [usuarios, setUsuarios] = useState([]);
   const navigate = useNavigate();
 
   const cargarUsuarios = () => {
-    axios.get("http://localhost:3001/api/usuarios")
-      .then(res => {
+    axios
+      .get("http://localhost:3001/api/usuarios")
+      .then((res) => {
         if (Array.isArray(res.data)) {
           setUsuarios(res.data);
         } else {
@@ -27,11 +28,14 @@ export default function UsuariosAdmin() {
 
         setTimeout(() => {
           if (!$.fn.DataTable.isDataTable("#tablaUsuarios")) {
-            $('#tablaUsuarios').DataTable({
+            $("#tablaUsuarios").DataTable({
               responsive: true,
               autoWidth: false,
               pageLength: 4,
-              lengthMenu: [[4, 8, 10], [4, 8, 10]],
+              lengthMenu: [
+                [4, 8, 10],
+                [4, 8, 10],
+              ],
               language: {
                 lengthMenu: "Mostrar _MENU_ registros por página",
                 zeroRecords: "No se encontraron resultados",
@@ -43,63 +47,59 @@ export default function UsuariosAdmin() {
                   first: "Primero",
                   last: "Último",
                   next: "Siguiente",
-                  previous: "Anterior"
-                }
+                  previous: "Anterior",
+                },
               },
               columnDefs: [
                 {
                   targets: [0, 3, 4],
-                  searchable: true
+                  searchable: true,
                 },
                 {
                   targets: "_all",
-                  searchable: false
-                }
-              ]
+                  searchable: false,
+                },
+              ],
             });
           }
         }, 100);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   };
 
-  const eliminarUsuario = async (id) => {
+  const cambiarEstadoUsuario = async (id, nuevoEstado) => {
     const confirm = await Swal.fire({
-      icon: 'question',
-      title: 'Eliminar usuario',
-      text: '¿Estás seguro de eliminar este usuario?',
+      icon: "question",
+      title: `${nuevoEstado === "Activo" ? "Activar" : "Inactivar"} usuario`,
+      text: `¿Estás seguro de ${nuevoEstado === "Activo" ? "activar" : "inactivar"} este usuario?`,
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: "Sí, continuar",
+      cancelButtonText: "Cancelar",
     });
 
     if (!confirm.isConfirmed) return;
 
-    // Obtener usuario logueado
-    const usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
-
     try {
-      const response = await axios.delete(`http://localhost:3001/api/usuarios/${id}`);
+      const response = await axios.put(
+        `http://localhost:3001/api/usuarios/${id}/estado`,
+        { estado: nuevoEstado }
+      );
+
       if (response.status === 200) {
-        await Swal.fire('Eliminado', 'El usuario ha sido eliminado.', 'success');
-        // Si el usuario eliminado es el admin logueado, recargar al index
-        if (usuarioLogueado && usuarioLogueado.id_usuario === id && usuarioLogueado.id_rol === 1) {
-          localStorage.removeItem('usuario');
-          window.location.replace('/');
-          return;
-        }
+        await Swal.fire(
+          "Éxito",
+          `El usuario ahora está ${nuevoEstado}.`,
+          "success"
+        );
+
         if ($.fn.DataTable.isDataTable("#tablaUsuarios")) {
           $("#tablaUsuarios").DataTable().destroy();
         }
         cargarUsuarios();
       }
     } catch (error) {
-      console.error("Error al eliminar usuario:", error);
-      if (error.response && error.response.status === 409) {
-        Swal.fire('Error', error.response.data.error, 'warning'); // mensaje personalizado
-      } else {
-        Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
-      }
+      console.error("Error al cambiar estado:", error);
+      Swal.fire("Error", "No se pudo cambiar el estado del usuario.", "error");
     }
   };
 
@@ -121,11 +121,16 @@ export default function UsuariosAdmin() {
       <main className="main-content p-4" style={{ marginLeft: "280px" }}>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="mb-0">Gestión de usuarios</h1>
-          <a href="/agregar-usuarios" className="btn btn-warning text-white">Añadir Administrador</a>
+          <a href="/agregar-usuarios" className="btn btn-warning text-white">
+            Añadir Administrador
+          </a>
         </div>
 
         <div className="table-responsive">
-          <table className="table table-bordered table-striped" id="tablaUsuarios">
+          <table
+            className="table table-bordered table-striped"
+            id="tablaUsuarios"
+          >
             <thead className="table-dark">
               <tr>
                 <th>ID</th>
@@ -137,11 +142,12 @@ export default function UsuariosAdmin() {
                 <th>Dirección</th>
                 <th>Contraseña</th>
                 <th>Rol</th>
+                <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {usuarios.map(usuario => (
+              {usuarios.map((usuario) => (
                 <tr key={usuario.id_usuario}>
                   <td>{usuario.id_usuario}</td>
                   <td>{usuario.cedula}</td>
@@ -153,16 +159,46 @@ export default function UsuariosAdmin() {
                   <td>*******</td>
                   <td>{usuario.rol}</td>
                   <td>
+                    <span
+                      className={`badge ${
+                        usuario.estado.toLowerCase() === "activo"
+                          ? "bg-success"
+                          : "bg-secondary"
+                      }`}
+                    >
+                      {usuario.estado}
+                    </span>
+                  </td>
+                  <td>
                     <div className="d-flex gap-1">
-                      <button className="btn btn-success btn-sm" onClick={() => navigate(`/editar-usuario/${usuario.id_usuario}`)}>
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() =>
+                          navigate(`/editar-usuario/${usuario.id_usuario}`)
+                        }
+                      >
                         <FontAwesomeIcon icon={faEdit} /> Editar
                       </button>
-                      <button
-                        onClick={() => eliminarUsuario(usuario.id_usuario)}
-                        className="btn btn-danger btn-sm"
-                      >
-                        <FontAwesomeIcon icon={faTrash} /> Eliminar
-                      </button>
+
+                      {usuario.estado.toLowerCase() === "activo" ? (
+                        <button
+                          onClick={() =>
+                            cambiarEstadoUsuario(usuario.id_usuario, "Inactivo")
+                          }
+                          className="btn btn-warning btn-sm"
+                        >
+                          Inactivar
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            cambiarEstadoUsuario(usuario.id_usuario, "Activo")
+                          }
+                          className="btn btn-primary btn-sm"
+                        >
+                          Activar
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
