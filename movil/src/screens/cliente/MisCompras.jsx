@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../../config/api';
 import styles from '../../css/MisCompras';
+import cardStyles from '../../css/MisComprasCard';
 import Header from '../../Components/Header';
 import PerfilDropdown from '../../Components/PerfilDropdown';
 import { TouchableWithoutFeedback } from 'react-native';
@@ -31,9 +32,11 @@ export default function MisCompras({ navigation }) {
     })();
   }, []);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [compraSeleccionada, setCompraSeleccionada] = useState(null);
+
   const handleCancelar = async (id_pedido) => {
     // Falta poner la logica para cancelar el pedido
- 
   };
 
 
@@ -62,43 +65,78 @@ export default function MisCompras({ navigation }) {
       {compras.length === 0 ? (
         <Text style={{ color: '#888', marginTop: 30, textAlign: 'center' }}>No tienes compras registradas.</Text>
       ) : (
-        <View style={styles.table}>
-          {/* ENCABEZADO */}
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.cellHeader]}>ID Pedido</Text>
-            <Text style={[styles.cell, styles.cellHeader]}>Dirección</Text>
-            <Text style={[styles.cell, styles.cellHeader]}>Productos</Text>
-            <Text style={[styles.cell, styles.cellHeader]}>Total</Text>
-            <Text style={[styles.cell, styles.cellHeader]}>Estado</Text>
-            <Text style={[styles.cell, styles.cellHeader]}>Acción</Text>
-          </View>
-          {/* FILAS DE COMPRA*/}
+        <ScrollView style={{ marginBottom: 10 }}>
           {compras.map((compra) => (
-            <View style={styles.row} key={compra.id_pedido}>
-              <Text style={styles.cell}>{compra.id_pedido}</Text>
-              <Text style={styles.cell}>{compra.direccion}</Text>
-              <View style={[styles.cell, { flex: 2 }]}> {/* Productos en columna */}
-                {Array.isArray(compra.productos) && compra.productos.length > 0 ? (
-                  compra.productos.map((prod, idx) => (
-                    <Text key={idx} style={styles.productosList}>{prod.nombre} (x{prod.cantidad})</Text>
-                  ))
-                ) : (
-                  <Text style={styles.productosList}>Sin productos</Text>
-                )}
+            <TouchableOpacity
+              key={compra.id_pedido}
+              style={cardStyles.card}
+              onPress={() => { setCompraSeleccionada(compra); setModalVisible(true); }}
+              activeOpacity={0.85}
+            >
+              <View style={cardStyles.cardHeader}>
+                <Text style={cardStyles.cardTitle}>IDPedido: {compra.id_pedido}</Text>
+                <Text style={cardStyles.cardEstado}>{compra.estado}</Text>
               </View>
-              <Text style={styles.cell}>{compra.total ? `$${compra.total.toLocaleString('es-CO')}` : ''}</Text>
-              <Text style={styles.cellEstado}>{compra.estado}</Text>
-              <TouchableOpacity
-                style={styles.cellAccion}
-                onPress={() => handleCancelar(compra.id_pedido)}
-                disabled={compra.estado !== 'pendiente'}
-              >
-                <Text style={styles.cellAccionText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
+              <Text style={{ color: '#444', marginBottom: 4 }}>Total: <Text style={{ fontWeight: 'bold' }}>{compra.total ? `$${compra.total.toLocaleString('es-CO')}` : ''}</Text></Text>
+              <Text style={{ color: '#888', fontSize: 13 }}>Dirección: {compra.direccion}</Text>
+            </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       )}
+
+      {/* Modal con la tabla de detalle */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.18)', justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={{ backgroundColor: '#f5f6fa', borderRadius: 14, padding: 18, minWidth: 320, maxWidth: 380, width: '90%' }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 10, color: '#23272f', textAlign: 'center' }}>Detalle de pedido</Text>
+                {compraSeleccionada && (
+                  <View>
+                    <View style={styles.table}>
+                      <View style={styles.row}>
+                        <Text style={[styles.cell, styles.cellHeader, {color: '#23272f'}]}>Producto</Text>
+                        <Text style={[styles.cell, styles.cellHeader, {color: '#23272f'}]}>Cantidad</Text>
+                      </View>
+                      {Array.isArray(compraSeleccionada.productos) && compraSeleccionada.productos.length > 0 ? (
+                        compraSeleccionada.productos.map((prod) => (
+                          <View style={styles.row} key={prod.nombre + '-' + prod.cantidad}>
+                            <Text style={[styles.cell, {color: '#23272f'}]}>{prod.nombre}</Text>
+                            <Text style={[styles.cell, {color: '#23272f'}]}>{prod.cantidad}</Text>
+                          </View>
+                        ))
+                      ) : (
+                        <View style={styles.row}>
+                          <Text style={[styles.cell, {color: '#23272f'}]}>Sin productos</Text>
+                          <Text style={[styles.cell, {color: '#23272f'}]}></Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={{ color: '#23272f', marginTop: 8 }}>Dirección: <Text style={{ fontWeight: 'bold', color: '#23272f' }}>{compraSeleccionada.direccion}</Text></Text>
+                    <Text style={{ color: '#23272f' }}>Total: <Text style={{ fontWeight: 'bold', color: '#23272f' }}>{compraSeleccionada.total ? `$${compraSeleccionada.total.toLocaleString('es-CO')}` : ''}</Text></Text>
+                    <Text style={{ color: '#23272f', marginBottom: 8 }}>Estado: <Text style={{ color: '#23272f', fontWeight: 'bold' }}>{compraSeleccionada.estado}</Text></Text>
+                    <TouchableOpacity
+                      style={[styles.cellAccion, { alignSelf: 'center', marginTop: 10, backgroundColor: '#e1e1e1' }]}
+                      onPress={() => handleCancelar(compraSeleccionada.id_pedido)}
+                      disabled={compraSeleccionada.estado !== 'pendiente'}
+                    >
+                      <Text style={{ color: '#23272f', fontWeight: 'bold' }}>Cancelar compra</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+                <TouchableOpacity onPress={() => setModalVisible(false)} style={{ marginTop: 18, alignSelf: 'center' }}>
+                  <Text style={{ color: '#23272f', fontWeight: 'bold', fontSize: 16 }}>Cerrar</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 }
