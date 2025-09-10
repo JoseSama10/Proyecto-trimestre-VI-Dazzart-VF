@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "movil",
-    "slug": "movil",
+  "name": "Dazzart Components",
+  "slug": "dazzart-components",
     "version": "1.0.0",
     "orientation": "portrait",
   "icon": "./src/assets/logo.png",
-    "scheme": "movil",
+  "scheme": "dazzart-components",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
