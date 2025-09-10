@@ -78,7 +78,11 @@ export default function DetalleProducto() {
                             navigation.navigate('Carrito', { usuario });
                         }
                     }}
-                    onSearch={() => navigation.navigate('Index', { usuario })}
+                    onSearch={(searchText) => {
+                        if (searchText && searchText.trim().length > 0) {
+                            navigation.navigate('VistaProductos', { search: searchText });
+                        }
+                    }}
                 />
 
                 <PerfilDropdown
