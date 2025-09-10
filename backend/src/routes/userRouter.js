@@ -6,7 +6,7 @@ router.post('/register', userController.registerUser);
 router.get('/', userController.listarUsuarios);
 router.post('/', userController.agregarUsuario);
 router.put('/:id', userController.actualizarUsuario);
-router.delete('/:id', userController.eliminarUsuario);
+router.put('/:id/estado', userController.cambiarEstadoUsuario);
 router.get('/usuario/:id', userController.obtenerUsuarioPorId); 
 
 

@@ -137,36 +137,19 @@ exports.actualizarUsuario = async (req, res) => {
   }
 };
 
-// busca el id por fila del usuario en la tabla y lo elimina//
-exports.eliminarUsuario = async (req, res) => {
+exports.cambiarEstadoUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+
   try {
-    const { id } = req.params;
-    // No permitir eliminar el admin principal
-    if (Number(id) === 1) {
-      return res.status(403).json({ error: 'No se puede eliminar este administrador principal.' });
-    }
-    // Verificar si el usuario a eliminar es admin
-    const [userRows] = await db.query('SELECT id_rol FROM usuario WHERE id_usuario = ?', [id]);
-    if (userRows.length === 0) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-    if (userRows[0].id_rol === 1) {
-      // Contar admins
-      const [adminRows] = await db.query('SELECT COUNT(*) AS total FROM usuario WHERE id_rol = 1');
-      if (adminRows[0].total <= 1) {
-        return res.status(403).json({ error: 'No se puede eliminar el último administrador.' });
-      }
-    }
-    await db.query('DELETE FROM usuario WHERE id_usuario = ?', [id]);
-    res.json({ message: 'Usuario eliminado' });
+    await db.query(
+      'UPDATE usuario SET estado = ? WHERE id_usuario = ?',
+      [estado, id]
+    );
+    res.json({ message: `Usuario ${estado}` });
   } catch (error) {
-    if (error.code === 'ER_ROW_IS_REFERENCED_2') {
-      return res.status(409).json({
-        error: 'No se puede eliminar el usuario porque tiene pedidos asociados.'
-      });
-    }
-    console.error('Error al eliminar usuario:', error);
-    res.status(500).json({ error: 'Error al eliminar el usuario' });
+    console.error('Error al cambiar estado:', error);
+    res.status(500).json({ error: 'Error al cambiar el estado del usuario' });
   }
 };
 

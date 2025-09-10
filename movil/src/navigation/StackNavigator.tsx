@@ -18,7 +18,9 @@ import EditarProductoScreen from '../screens/admin/EditarProducto.jsx';
 import DescuentosAdmin from '../screens/admin/Descuento';
 import FormularioDescuento from '../screens/admin/FormularioDescuento';
 import EditarDescuento from '../screens/admin/EditarDescuento';
-
+import UsuariosAdmin from '../screens/admin/GestionUsuarios'
+import EditarUsuario from '../screens/admin/EditarUsuario'
+import AgregarUsuario from '../screens/admin/AgregarUsuarios'
 // Tipado de rutas
 export type RootStackParamList = {
   Index: undefined;
@@ -37,6 +39,9 @@ export type RootStackParamList = {
   Descuentos: undefined;
   AgregarDescuento: undefined;
   EditarDescuento: undefined;
+  Usuarios: undefined;
+  EditarUsuario: undefined;
+  AgregarUsuario: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -114,6 +119,22 @@ export default function StackNavigator() {
         options={{ title: 'Editar Descuento'}}
       />
 
+       <Stack.Screen
+        name="Usuarios"
+        component={UsuariosAdmin}
+        options={{ title: 'Usuarios Admin'}}
+      />
+       
+       <Stack.Screen
+        name="EditarUsuario"
+        component={EditarUsuario}
+        options={{ title: 'Editar Usuarios'}}
+      />
+       <Stack.Screen
+        name="AgregarUsuario"
+        component={AgregarUsuario}
+        options={{ title: 'Agregar Usuarios'}}
+      />
 
 
 
