@@ -42,21 +42,19 @@ export default function VistaProductos({ navigation, route }) {
   // MOSTAR MODAL DE DETALLE PARA AGREGAR AL CARRITO
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
   const [productoAgregar, setProductoAgregar] = useState(null);
-
-  const handleAgregarCarrito = producto => {
+  const handleAgregarCarrito = (producto, cantidad = 1) => {
     if (!usuario) {
       setShowLogin(true);
       return;
     }
-    // LOGICA AGREGAR CARRITO
     (async () => {
       try {
         await API.post('/carrito', {
           id_usuario: usuario.id_usuario,
           id_producto: producto._id || producto.id || producto.id_producto,
-          cantidad: 1,
+          cantidad: cantidad,
         });
-        setFeedbackMsg(`Agregado al carrito: ${producto.nombre}`);
+        setFeedbackMsg(`Agregado al carrito: ${producto.nombre} x${cantidad}`);
       } catch (e) {
         setFeedbackMsg('Error al agregar al carrito');
       }
@@ -256,6 +254,7 @@ export default function VistaProductos({ navigation, route }) {
                   onAgregarCarrito={() => handleAgregarCarrito(prod)}
                   showIcons={true}
                   iconColor="#1976d2"
+                  onPress={() => navigation.navigate('DetalleProducto', { producto: prod, usuario })}
                 />
               </View>
             ))}
