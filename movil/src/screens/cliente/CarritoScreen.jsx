@@ -99,7 +99,9 @@ const CarritoScreen = ({ navigation, route }) => {
         id_producto: p.id_producto || p._id || p.id,
         nombre: p.nombre,
         cantidad: p.cantidad || 1,
-        precio: p.precio_final || p.precio || 0
+        precio: p.precio_final || p.precio || 0,
+        descuento_aplicado: !!p.descuento_aplicado,
+        precio_original: p.precio || 0
       }));
       const total_productos = productos.reduce((sum, p) => sum + (p.cantidad || 1), 0);
       const total = productos.reduce((sum, p) => sum + (p.precio || 0) * (p.cantidad || 1), 0);
@@ -182,10 +184,20 @@ const CarritoScreen = ({ navigation, route }) => {
                 <View style={preciosStyles.itemInfo}>
                   <Text style={preciosStyles.itemName}>{item.nombre}</Text>
                   <View style={preciosStyles.preciosContainer}>
-                    {item.descuento_aplicado ? (
-                      <Text style={preciosStyles.precioTachado}>${item.precio}</Text>
-                    ) : null}
-                    <Text style={item.descuento_aplicado ? preciosStyles.precioDescuento : preciosStyles.precioNormal}>{`$${item.precio_final || item.precio}`}</Text>
+                    {(item.precio_original && item.precio_final && Number(item.precio_final) < Number(item.precio_original)) ? (
+                      <>
+                        <Text style={preciosStyles.precioTachado}>
+                          ${item.precio_original}
+                        </Text>
+                        <Text style={preciosStyles.precioDescuento}>
+                          ${item.precio_final}
+                        </Text>
+                      </>
+                    ) : (
+                      <Text style={preciosStyles.precioNormal}>
+                        ${item.precio_final || item.precio_original}
+                      </Text>
+                    )}
                   </View>
                   <Text style={preciosStyles.cantidad}>Cantidad: {item.cantidad || 1}</Text>
                 </View>
