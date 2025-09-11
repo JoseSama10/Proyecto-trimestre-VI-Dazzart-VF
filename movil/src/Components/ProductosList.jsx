@@ -60,8 +60,8 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
   const [showIcons, setShowIcons] = useState(false);
   const hideIconsTimeout = React.useRef(null);
   const flatListRef = React.useRef(null);
-  // REPETIR EL ARRAY 7 VECES PARA MAYOR FLUIDEZ
-  const repeatCount = 7;
+  // REPETIR EL ARRAY MÁS VECES PARA UN LOOP MÁS LARGO Y FLUIDO
+  const repeatCount = 21; // antes 7, ahora 21
   const loopedProductos = productos.length > 0 ? Array(repeatCount).fill(productos).flat() : [];
   const middleIndex = productos.length * Math.floor(repeatCount / 2);
 
@@ -103,7 +103,10 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
       <FlatList
         ref={flatListRef}
         data={loopedProductos}
-        keyExtractor={(_, idx) => idx.toString()}
+        keyExtractor={(item, idx) => {
+          const realId = item && (item._id || item.id || item.id_producto || 'sinid');
+          return `${realId}-loop-${idx}`;
+        }}
         renderItem={({ item }) => (
           <ProductoCard
             producto={item}
@@ -118,28 +121,15 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
         contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
         style={{ minHeight: 360 }}
         initialScrollIndex={middleIndex}
-        getItemLayout={(_, index) => ({ length: 160, offset: 160 * index, index })}
+        getItemLayout={(_, index) => ({ length: 226, offset: 226 * index, index })} // 210 (card) + 16 (marginRight)
         onScrollBeginDrag={() => {
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }
           setShowIcons(true);
         }}
-        onMomentumScrollEnd={event => {
-          const offsetX = event.nativeEvent.contentOffset.x;
-          const itemWidth = 160;
-          const totalItems = loopedProductos.length;
-          const visibleItems = productos.length;
-          // UMBRAL MAS AMPLIO PARA REPOSICIONAR (FLUIDEZ)
-          const threshold = itemWidth * visibleItems * 2;
-          if (flatListRef.current && productos.length > 0) {
-            if (offsetX <= threshold) {
-              flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
-            } else if (offsetX >= itemWidth * (totalItems - visibleItems * 2)) {
-              flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
-            }
-          }
-          // OCULAR ICONOS DESPUES DE UN TIEMPO
+        onMomentumScrollEnd={() => {
+          // SE OCULTAN ICONOS DESPUES DE 950ms
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }
