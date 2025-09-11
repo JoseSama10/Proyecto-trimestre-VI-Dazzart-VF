@@ -59,14 +59,20 @@ export default function DescuentosAdmin() {
     ]);
   };
 
+  // 🔄 Cargar datos al montar y cada 5s
   useEffect(() => {
-    cargarDescuentos();
+    cargarDescuentos(); // primera carga
+
+    const intervalo = setInterval(() => {
+      cargarDescuentos(); // recarga cada 5 segundos
+    }, 5000);
+
+    return () => clearInterval(intervalo); // limpieza
   }, []);
 
-  // Filtrado por búsqueda (tipo, estado, producto/categoría, valor y fechas)
+  // Filtrado por búsqueda
   const descuentosFiltrados = descuentos.filter((d) => {
     const texto = search.trim().toLowerCase();
-
     const fechaInicio = d.fecha_inicio?.split("T")[0] || "";
     const fechaFin = d.fecha_fin?.split("T")[0] || "";
     const aplicacionNombre =
@@ -83,7 +89,7 @@ export default function DescuentosAdmin() {
     );
   });
 
-  //Paginación sobre los filtrados
+  //Paginación
   const indiceUltimo = paginaActual * descuentosPorPagina;
   const indicePrimero = indiceUltimo - descuentosPorPagina;
   const descuentosVisibles = descuentosFiltrados.slice(

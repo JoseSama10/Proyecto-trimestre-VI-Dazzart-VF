@@ -47,7 +47,14 @@ export default function UsuariosAdmin() {
   };
 
   useEffect(() => {
-    cargarUsuarios();
+    cargarUsuarios(); // carga inicial
+
+    // 🔄 Auto-actualización cada 5 segundos
+    const intervalo = setInterval(() => {
+      cargarUsuarios();
+    }, 5000);
+
+    return () => clearInterval(intervalo); // limpiar al desmontar
   }, []);
 
   // 🔎 Filtrado por búsqueda (nombre, usuario, correo)
