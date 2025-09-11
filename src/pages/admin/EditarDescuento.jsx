@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import SidebarAdmin from "../../components/SideBarAdmin.jsx";
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import "../../css/CSSA/actualizardescuento.css";
 
@@ -42,8 +42,17 @@ export default function EditarDescuento() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const hoy = new Date().toISOString().split("T")[0]; // fecha actual en formato YYYY-MM-DD
+
+    // Validación de fechas
     if (form.fecha_fin < form.fecha_inicio) {
       alert("La fecha de fin no puede ser anterior a la de inicio.");
+      return;
+    }
+
+    // 🚩 Validación especial: si la fecha ya expiró no puede reactivarse
+    if (form.fecha_fin < hoy && form.estado_descuento === "Activo") {
+      alert("El descuento ya expiró. Debe actualizar las fechas a un rango válido antes de poder activarlo.");
       return;
     }
 
