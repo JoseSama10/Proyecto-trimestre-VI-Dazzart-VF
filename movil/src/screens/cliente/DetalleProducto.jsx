@@ -93,7 +93,6 @@ export default function DetalleProducto() {
                         await AsyncStorage.removeItem('usuario');
                         setUsuario(null);
                         setShowPerfil(false);
-                        // Forzar recarga visual y limpiar params
                         navigation.reset({
                             index: 0,
                             routes: [{ name: 'Index' }],
