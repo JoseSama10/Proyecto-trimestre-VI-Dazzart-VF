@@ -12,13 +12,19 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
     imgUrl = `${API.defaults.baseURL.replace(/\/api$/, '')}/productos/img/${imgUrl}`;
   }
 
+  // FORMATEO DE PRECIOS CON PUNTOS DE MILES
+  const precioOriginal = Number(producto?.precio) || 0;
+  const precioFinal = Number(producto?.precio_final) || 0;
+  const precioOriginalStr = `$${precioOriginal.toLocaleString('es-CO')}`;
+  const precioFinalStr = `$${precioFinal.toLocaleString('es-CO')}`;
+
   return (
-    <TouchableOpacity
-      activeOpacity={0.95}
-      style={styles.card}
-      onPress={onPress}
-    >
-      <View style={styles.imageContainer}>
+    <View style={styles.card}>
+      <TouchableOpacity
+        activeOpacity={0.95}
+        style={styles.imageContainer}
+        onPress={onPress}
+      >
         {imgUrl ? (
           <Image source={{ uri: imgUrl }} style={styles.image} />
         ) : (
@@ -26,30 +32,30 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
             <FontAwesome name="image" size={60} color="#aaa" />
           </View>
         )}
-        {showIcons && (
-          <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', zIndex: 2 }}>
-            <TouchableOpacity onPress={() => onVerDetalle(producto)} style={{ marginHorizontal: 4 }}>
-              <FontAwesome name="search" size={26} color="#444" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => onAgregarCarrito(producto)} style={{ marginHorizontal: 4 }}>
-              <FontAwesome name="shopping-cart" size={26} color="#444" />
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+      </TouchableOpacity>
+      {showIcons && (
+        <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', zIndex: 2 }}>
+          <TouchableOpacity onPress={() => onVerDetalle(producto)} style={{ marginHorizontal: 4 }}>
+            <FontAwesome name="search" size={26} color="#444" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onAgregarCarrito(producto)} style={{ marginHorizontal: 4 }}>
+            <FontAwesome name="shopping-cart" size={26} color="#444" />
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.infoContainer}>
         <Text style={styles.nombre} numberOfLines={2}>{producto?.nombre || ''}</Text>
         <Text style={styles.descripcion} numberOfLines={2}>{producto?.descripcion || ''}</Text>
         {producto?.descuento_aplicado ? (
-          <View style={styles.precioContainer}>
-            <Text style={styles.precioTachado}>{`$${producto?.precio}`}</Text>
-            <Text style={styles.precioDescuento}>{`$${producto?.precio_final}`}</Text>
+          <View style={{ alignItems: 'center', marginTop: 8 }}>
+            <Text style={styles.precioTachado}>{precioOriginalStr}</Text>
+            <Text style={styles.precioDescuento}>{precioFinalStr}</Text>
           </View>
         ) : (
-          <Text style={styles.precioNormal}>{`$${producto?.precio}`}</Text>
+          <Text style={styles.precioNormal}>{precioOriginalStr}</Text>
         )}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -60,8 +66,8 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
   const [showIcons, setShowIcons] = useState(false);
   const hideIconsTimeout = React.useRef(null);
   const flatListRef = React.useRef(null);
-  // REPETIR EL ARRAY 7 VECES PARA MAYOR FLUIDEZ
-  const repeatCount = 7;
+  // REPETIR EL ARRAY MÁS VECES PARA UN LOOP MÁS LARGO Y FLUIDO
+  const repeatCount = 21; 
   const loopedProductos = productos.length > 0 ? Array(repeatCount).fill(productos).flat() : [];
   const middleIndex = productos.length * Math.floor(repeatCount / 2);
 
@@ -103,7 +109,10 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
       <FlatList
         ref={flatListRef}
         data={loopedProductos}
-        keyExtractor={(_, idx) => idx.toString()}
+        keyExtractor={(item, idx) => {
+          const realId = item && (item._id || item.id || item.id_producto || 'sinid');
+          return `${realId}-loop-${idx}`;
+        }}
         renderItem={({ item }) => (
           <ProductoCard
             producto={item}
@@ -118,28 +127,15 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
         contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
         style={{ minHeight: 360 }}
         initialScrollIndex={middleIndex}
-        getItemLayout={(_, index) => ({ length: 160, offset: 160 * index, index })}
+        getItemLayout={(_, index) => ({ length: 226, offset: 226 * index, index })} // 210 (card) + 16 (marginRight)
         onScrollBeginDrag={() => {
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }
           setShowIcons(true);
         }}
-        onMomentumScrollEnd={event => {
-          const offsetX = event.nativeEvent.contentOffset.x;
-          const itemWidth = 160;
-          const totalItems = loopedProductos.length;
-          const visibleItems = productos.length;
-          // UMBRAL MAS AMPLIO PARA REPOSICIONAR (FLUIDEZ)
-          const threshold = itemWidth * visibleItems * 2;
-          if (flatListRef.current && productos.length > 0) {
-            if (offsetX <= threshold) {
-              flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
-            } else if (offsetX >= itemWidth * (totalItems - visibleItems * 2)) {
-              flatListRef.current.scrollToIndex({ index: middleIndex, animated: false });
-            }
-          }
-          // OCULAR ICONOS DESPUES DE UN TIEMPO
+        onMomentumScrollEnd={() => {
+          // SE OCULTAN ICONOS DESPUES DE 950ms
           if (hideIconsTimeout.current) {
             clearTimeout(hideIconsTimeout.current);
           }

@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import Header from '../Components/Header';
-import Footer from '../Components/Footer';
-import MenuLateral from '../Components/MenuLateral';
-import { ProductoCard } from '../Components/ProductosList';
-import ModalDetalleProducto from '../Components/ModalDetalleProducto';
-import API from '../config/api';
-import styles from '../css/VistaProductos';
-import ModalFeedback from '../Components/ModalFeedback';
-import PerfilDropdown from '../Components/PerfilDropdown';
-import ModalLogin from '../Components/ModalLogin';
+import Header from '../../Components/Header';
+import Footer from '../../Components/Footer';
+import MenuLateral from '../../Components/MenuLateral';
+import { ProductoCard } from '../../Components/ProductosList';
+import ModalDetalleProducto from '../../Components/ModalDetalleProducto';
+import API from '../../config/api';
+import styles from '../../css/VistaProductos';
+import ModalFeedback from '../../Components/ModalFeedback';
+import PerfilDropdown from '../../Components/PerfilDropdown';
+import ModalLogin from '../../Components/ModalLogin';
 
 export default function VistaProductos({ navigation, route }) {
   const [modalFeedbackOpen, setModalFeedbackOpen] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState('');
   const [productos, setProductos] = useState([]);
   const [usuario, setUsuario] = useState(null);
+  const searchParam = route?.params?.search || '';
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
       const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
@@ -41,21 +42,19 @@ export default function VistaProductos({ navigation, route }) {
   // MOSTAR MODAL DE DETALLE PARA AGREGAR AL CARRITO
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
   const [productoAgregar, setProductoAgregar] = useState(null);
-
-  const handleAgregarCarrito = producto => {
+  const handleAgregarCarrito = (producto, cantidad = 1) => {
     if (!usuario) {
       setShowLogin(true);
       return;
     }
-    // LOGICA AGREGAR CARRITO
     (async () => {
       try {
         await API.post('/carrito', {
           id_usuario: usuario.id_usuario,
           id_producto: producto._id || producto.id || producto.id_producto,
-          cantidad: 1,
+          cantidad: cantidad,
         });
-        setFeedbackMsg(`Agregado al carrito: ${producto.nombre}`);
+        setFeedbackMsg(`Agregado al carrito: ${producto.nombre} x${cantidad}`);
       } catch (e) {
         setFeedbackMsg('Error al agregar al carrito');
       }
@@ -81,7 +80,25 @@ export default function VistaProductos({ navigation, route }) {
   }, [idCategoria]);
 
   useEffect(() => {
-    if (idCategoria && idSubcategoria) {
+    if (searchParam && searchParam.trim().length > 0) {
+      API.get('/productos/listar')
+        .then(res => {
+          let filtrados = res.data.filter(
+            p => p.nombre && p.nombre.toLowerCase().includes(searchParam.toLowerCase())
+          );
+          if (soloOferta) filtrados = filtrados.filter(p => p.oferta === true);
+          if (orden === 'popularidad') {
+            filtrados.sort((a, b) => (b.popularidad || 0) - (a.popularidad || 0));
+          } else if (orden === 'precio_asc') {
+            filtrados.sort((a, b) => a.precio - b.precio);
+          } else if (orden === 'precio_desc') {
+            filtrados.sort((a, b) => b.precio - a.precio);
+          }
+          filtrados = filtrados.slice(0, mostrarCantidad);
+          setProductos(filtrados);
+        })
+        .catch(() => setProductos([]));
+    } else if (idCategoria && idSubcategoria) {
       API.get('/productos/listar')
         .then(res => {
           let filtrados = res.data.filter(
@@ -100,7 +117,7 @@ export default function VistaProductos({ navigation, route }) {
         })
         .catch(() => setProductos([]));
     }
-  }, [idCategoria, idSubcategoria, soloOferta, orden, mostrarCantidad]);
+  }, [idCategoria, idSubcategoria, soloOferta, orden, mostrarCantidad, searchParam]);
 
   const handleVerDetalle = producto => {
     setProductoSeleccionado(producto);
@@ -151,7 +168,11 @@ export default function VistaProductos({ navigation, route }) {
           }
           navigation.navigate('Carrito', { usuario });
         }}
-        onSearch={() => navigation.navigate('Index', { usuario })}
+        onSearch={(searchText) => {
+          if (searchText && searchText.trim().length > 0) {
+            navigation.navigate('VistaProductos', { search: searchText });
+          }
+        }}
       />
       <Modal visible={showMenu} animationType="slide" transparent>
         <MenuLateral
@@ -233,6 +254,7 @@ export default function VistaProductos({ navigation, route }) {
                   onAgregarCarrito={() => handleAgregarCarrito(prod)}
                   showIcons={true}
                   iconColor="#1976d2"
+                  onPress={() => navigation.navigate('DetalleProducto', { producto: prod, usuario })}
                 />
               </View>
             ))}

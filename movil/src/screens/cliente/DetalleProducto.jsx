@@ -78,7 +78,11 @@ export default function DetalleProducto() {
                             navigation.navigate('Carrito', { usuario });
                         }
                     }}
-                    onSearch={() => navigation.navigate('Index', { usuario })}
+                    onSearch={(searchText) => {
+                        if (searchText && searchText.trim().length > 0) {
+                            navigation.navigate('VistaProductos', { search: searchText });
+                        }
+                    }}
                 />
 
                 <PerfilDropdown
@@ -89,7 +93,6 @@ export default function DetalleProducto() {
                         await AsyncStorage.removeItem('usuario');
                         setUsuario(null);
                         setShowPerfil(false);
-                        // Forzar recarga visual y limpiar params
                         navigation.reset({
                             index: 0,
                             routes: [{ name: 'Index' }],

@@ -1,0 +1,80 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 10,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#444',
+    marginLeft: 2,
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 6,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f7f7f7',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  rowAlt: {
+    backgroundColor: '#fff',
+  },
+  cell: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRightWidth: 1,
+    borderRightColor: '#eee',
+    fontSize: 16,
+    color: '#222',
+  },
+  cellHeader: {
+    fontWeight: 'bold',
+    color: '#222',
+    fontSize: 17,
+    backgroundColor: '#fafafa',
+  },
+  cellEstado: {
+    backgroundColor: '#f7c948',
+    borderRadius: 7,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    alignSelf: 'flex-start',
+    color: '#222',
+    fontWeight: 'bold',
+    fontSize: 15,
+    overflow: 'hidden',
+    textAlign: 'center',
+    marginVertical: 2,
+  },
+  cellAccion: {
+    backgroundColor: '#d32f2f',
+    borderRadius: 7,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
+    alignSelf: 'flex-start',
+    marginVertical: 2,
+  },
+  cellAccionText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  productosList: {
+    color: '#222',
+    fontSize: 16,
+    marginBottom: 2,
+    marginLeft: 2,
+  },
+});
