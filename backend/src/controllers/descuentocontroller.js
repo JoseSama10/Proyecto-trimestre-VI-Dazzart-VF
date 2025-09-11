@@ -1,7 +1,5 @@
 const db = require('../config/db');
 
-// Crear un nuevo descuento (similar al formulario de Flask) //
-
 exports.crearDescuento = async (req, res) => {
   const {
     tipo_descuento,
