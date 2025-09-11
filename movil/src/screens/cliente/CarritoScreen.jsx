@@ -187,15 +187,15 @@ const CarritoScreen = ({ navigation, route }) => {
                     {(item.precio_original && item.precio_final && Number(item.precio_final) < Number(item.precio_original)) ? (
                       <>
                         <Text style={preciosStyles.precioTachado}>
-                          ${item.precio_original}
+                          ${Number(item.precio_original).toLocaleString('es-CO')}
                         </Text>
                         <Text style={preciosStyles.precioDescuento}>
-                          ${item.precio_final}
+                          ${Number(item.precio_final).toLocaleString('es-CO')}
                         </Text>
                       </>
                     ) : (
                       <Text style={preciosStyles.precioNormal}>
-                        ${item.precio_final || item.precio_original}
+                        ${Number(item.precio_final || item.precio_original).toLocaleString('es-CO')}
                       </Text>
                     )}
                   </View>
