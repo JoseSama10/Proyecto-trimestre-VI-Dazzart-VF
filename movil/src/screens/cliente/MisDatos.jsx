@@ -14,11 +14,11 @@ export default function MisDatos({ navigation }) {
   const [menuPerfilVisible, setMenuPerfilVisible] = useState(false);
 
 
-  // Mostrar menú de perfil
+  // MOSTRAR MENÚ DE PERFIL
   const handleLoginPress = () => {
     setMenuPerfilVisible(true);
   };
-  // Acciones del menú de perfil
+  // ACCIONES DEL MENÚ DE PERFIL
   const handleMisCompras = () => {
     setMenuPerfilVisible(false);
     navigation.navigate('MisCompras');
@@ -36,7 +36,7 @@ export default function MisDatos({ navigation }) {
     navigation.navigate('Carrito');
   };
 
-  // Búsqueda global desde la lupa
+  // BUSQUEDA DE LA LUPA
   const handleSearch = (searchText) => {
     navigation.navigate('VistaProductos', { search: searchText });
   };
