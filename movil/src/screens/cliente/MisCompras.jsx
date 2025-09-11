@@ -11,7 +11,7 @@ import { TouchableWithoutFeedback } from 'react-native';
 export default function MisCompras({ navigation }) {
   const [compras, setCompras] = useState([]);
   const [usuario, setUsuario] = useState(null);
-  // Handlers para header y menú usuario
+  // HANDLERS DEL HEADER Y MENÚ DE USUARIO
   const [menuPerfilVisible, setMenuPerfilVisible] = useState(false);
   const handleCartPress = () => navigation && navigation.navigate('Carrito');
   const handleSearch = (searchText) => navigation && navigation.navigate('VistaProductos', { search: searchText });
@@ -84,7 +84,7 @@ export default function MisCompras({ navigation }) {
         </ScrollView>
       )}
 
-      {/* Modal con la tabla de detalle */}
+      {/* MODAL CON LA TABLA DE DETALLE */}
       <Modal
         visible={modalVisible}
         animationType="slide"
