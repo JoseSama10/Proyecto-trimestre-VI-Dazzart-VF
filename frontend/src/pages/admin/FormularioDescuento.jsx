@@ -174,25 +174,6 @@ export default function FormularioDescuento() {
           </form>
         </div>
 
-        <div className="table-responsive mt-5">
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tipo de Descuento</th>
-                <th>Valor</th>
-                <th>Fecha Inicio</th>
-                <th>Fecha Fin</th>
-                <th>Estado</th>
-                <th>Aplicación</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Aquí iría el mapeo de los descuentos existentes */}
-            </tbody>
-          </table>
-        </div>
       </main>
     </>
   );
