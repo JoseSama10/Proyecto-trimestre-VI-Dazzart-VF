@@ -13,12 +13,12 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
   }
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.95}
-      style={styles.card}
-      onPress={onPress}
-    >
-      <View style={styles.imageContainer}>
+    <View style={styles.card}>
+      <TouchableOpacity
+        activeOpacity={0.95}
+        style={styles.imageContainer}
+        onPress={onPress}
+      >
         {imgUrl ? (
           <Image source={{ uri: imgUrl }} style={styles.image} />
         ) : (
@@ -26,22 +26,22 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
             <FontAwesome name="image" size={60} color="#aaa" />
           </View>
         )}
-        {showIcons && (
-          <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', zIndex: 2 }}>
-            <TouchableOpacity onPress={() => onVerDetalle(producto)} style={{ marginHorizontal: 4 }}>
-              <FontAwesome name="search" size={26} color="#444" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => onAgregarCarrito(producto)} style={{ marginHorizontal: 4 }}>
-              <FontAwesome name="shopping-cart" size={26} color="#444" />
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+      </TouchableOpacity>
+      {showIcons && (
+        <View style={{ position: 'absolute', top: 10, right: 10, flexDirection: 'row', zIndex: 2 }}>
+          <TouchableOpacity onPress={() => onVerDetalle(producto)} style={{ marginHorizontal: 4 }}>
+            <FontAwesome name="search" size={26} color="#444" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => onAgregarCarrito(producto)} style={{ marginHorizontal: 4 }}>
+            <FontAwesome name="shopping-cart" size={26} color="#444" />
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.infoContainer}>
         <Text style={styles.nombre} numberOfLines={2}>{producto?.nombre || ''}</Text>
         <Text style={styles.descripcion} numberOfLines={2}>{producto?.descripcion || ''}</Text>
         {producto?.descuento_aplicado ? (
-          <View style={styles.precioContainer}>
+          <View style={{ alignItems: 'center', marginTop: 8 }}>
             <Text style={styles.precioTachado}>{`$${producto?.precio}`}</Text>
             <Text style={styles.precioDescuento}>{`$${producto?.precio_final}`}</Text>
           </View>
@@ -49,7 +49,7 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
           <Text style={styles.precioNormal}>{`$${producto?.precio}`}</Text>
         )}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
