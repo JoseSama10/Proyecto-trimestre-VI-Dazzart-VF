@@ -12,6 +12,12 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
     imgUrl = `${API.defaults.baseURL.replace(/\/api$/, '')}/productos/img/${imgUrl}`;
   }
 
+  // FORMATEO DE PRECIOS CON PUNTOS DE MILES
+  const precioOriginal = Number(producto?.precio) || 0;
+  const precioFinal = Number(producto?.precio_final) || 0;
+  const precioOriginalStr = `$${precioOriginal.toLocaleString('es-CO')}`;
+  const precioFinalStr = `$${precioFinal.toLocaleString('es-CO')}`;
+
   return (
     <View style={styles.card}>
       <TouchableOpacity
@@ -42,11 +48,11 @@ export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIco
         <Text style={styles.descripcion} numberOfLines={2}>{producto?.descripcion || ''}</Text>
         {producto?.descuento_aplicado ? (
           <View style={{ alignItems: 'center', marginTop: 8 }}>
-            <Text style={styles.precioTachado}>{`$${producto?.precio}`}</Text>
-            <Text style={styles.precioDescuento}>{`$${producto?.precio_final}`}</Text>
+            <Text style={styles.precioTachado}>{precioOriginalStr}</Text>
+            <Text style={styles.precioDescuento}>{precioFinalStr}</Text>
           </View>
         ) : (
-          <Text style={styles.precioNormal}>{`$${producto?.precio}`}</Text>
+          <Text style={styles.precioNormal}>{precioOriginalStr}</Text>
         )}
       </View>
     </View>
@@ -61,7 +67,7 @@ const ProductosList = ({ onAgregarCarrito, usuario, onVerDetalle }) => {
   const hideIconsTimeout = React.useRef(null);
   const flatListRef = React.useRef(null);
   // REPETIR EL ARRAY MÁS VECES PARA UN LOOP MÁS LARGO Y FLUIDO
-  const repeatCount = 21; // antes 7, ahora 21
+  const repeatCount = 21; 
   const loopedProductos = productos.length > 0 ? Array(repeatCount).fill(productos).flat() : [];
   const middleIndex = productos.length * Math.floor(repeatCount / 2);
 
