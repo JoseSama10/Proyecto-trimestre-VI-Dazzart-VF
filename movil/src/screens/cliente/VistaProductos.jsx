@@ -42,9 +42,15 @@ export default function VistaProductos({ navigation, route }) {
   // MOSTAR MODAL DE DETALLE PARA AGREGAR AL CARRITO
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
   const [productoAgregar, setProductoAgregar] = useState(null);
+  const [modalRestringido, setModalRestringido] = useState(false);
   const handleAgregarCarrito = (producto, cantidad = 1) => {
     if (!usuario) {
       setShowLogin(true);
+      return;
+    }
+    // SI ES ADMIN, MOSTRAR MODAL Y NO AGREGAR
+    if (usuario.id_rol === 1) {
+      setModalRestringido(true);
       return;
     }
     (async () => {
@@ -290,6 +296,16 @@ export default function VistaProductos({ navigation, route }) {
         outlineBoton={true}
         outlineBotonSecundario={false}
         showClose={true}
+      />
+      <ModalFeedback
+        visible={modalRestringido}
+        onClose={() => setModalRestringido(false)}
+        titulo="Acceso restringido"
+        mensaje="Solo los usuarios pueden agregar productos al carrito. El administrador no puede hacer compras."
+        icono="error-outline"
+        colorTitulo="#000000FF"
+        textoBoton="Cerrar"
+        onBoton={() => setModalRestringido(false)}
       />
       {usuario && (
         <PerfilDropdown
