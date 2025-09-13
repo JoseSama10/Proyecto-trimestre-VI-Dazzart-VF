@@ -130,6 +130,22 @@ const CarritoScreen = ({ navigation, route }) => {
     navigation.goBack();
   }
 
+  // SI EL USUARIO ES ADMIN, MOSTRAR MODAL DE ACCESO RESTRINGIDO
+  if (usuarioState && usuarioState.id_rol === 1) {
+    return (
+      <ModalFeedback
+        visible={true}
+        onClose={() => navigation && navigation.goBack()}
+        titulo="Acceso restringido"
+        mensaje="Solo los usuarios pueden realizar pedidos. El administrador no puede hacer compras."
+        icono="error-outline"
+        colorTitulo="#000000FF"
+        textoBoton="Volver"
+        onBoton={() => navigation && navigation.goBack()}
+      />
+    );
+  }
+
   return (
     <>
       <ScrollView style={preciosStyles.scroll} contentContainerStyle={{ flexGrow: 1 }}>
