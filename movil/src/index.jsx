@@ -35,10 +35,16 @@ const Index = () => {
   const [perfilDropdownVisible, setPerfilDropdownVisible] = useState(false);
   const [modalDetalleVisible, setModalDetalleVisible] = useState(false);
   const [productoDetalle, setProductoDetalle] = useState(null);
+  const [modalRestringido, setModalRestringido] = useState(false);
 
   const handleAgregarCarrito = async (producto, cantidad = 1) => {
     if (!usuario) {
       setLoginVisible(true);
+      return;
+    }
+    // Si es admin, mostrar modal y no agregar
+    if (usuario.id_rol === 1) {
+      setModalRestringido(true);
       return;
     }
     try {
@@ -154,6 +160,20 @@ const Index = () => {
           }}
           showClose={true}
           onClose={() => setModalAgregadoVisible(false)}
+        />
+        <ModalFeedback
+          visible={modalRestringido}
+          icono="error-outline"
+          titulo="Acceso restringido"
+          mensaje="Solo los usuarios pueden agregar productos al carrito. El administrador no puede hacer compras."
+          colorFondo="#fff"
+          colorTitulo="#000000FF"
+          colorMensaje="#444"
+          textoBoton="Cerrar"
+          outlineBoton={true}
+          onBoton={() => setModalRestringido(false)}
+          showClose={true}
+          onClose={() => setModalRestringido(false)}
         />
         <BannerCarrusel />
         <View style={styles.content}>
