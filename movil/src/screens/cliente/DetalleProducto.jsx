@@ -30,6 +30,7 @@ export default function DetalleProducto() {
     const [modalVisible, setModalVisible] = useState(false);
     const [mensajeModal, setMensajeModal] = useState('');
     const [modalCarrito, setModalCarrito] = useState(false);
+    const [modalRestringido, setModalRestringido] = useState(false);
 
     const { width } = useWindowDimensions();
     const isLargeScreen = width > 600;
@@ -39,22 +40,29 @@ export default function DetalleProducto() {
     const [showPerfil, setShowPerfil] = useState(false);
     const [menuVisible, setMenuVisible] = useState(false);
 
-    const handleAgregarCarrito = async () => {
+    const handleAgregarCarrito = (producto, cantidad = 1) => {
         if (!usuario) {
             setShowLogin(true);
             return;
         }
-        try {
-            await API.post('/carrito', {
-                id_usuario: usuario.id_usuario,
-                id_producto: producto._id || producto.id || producto.id_producto,
-                cantidad: cantidad,
-            });
-            setModalCarrito(true);
-        } catch (e) {
-            setMensajeModal('Error al agregar al carrito');
-            setModalVisible(true);
+        // SI ES ADMIN, MOSTRAR MODAL Y NO AGREGAR
+        if (usuario.id_rol === 1) {
+            setModalRestringido(true);
+            return;
         }
+        (async () => {
+            try {
+                await API.post('/carrito', {
+                    id_usuario: usuario.id_usuario,
+                    id_producto: producto._id || producto.id || producto.id_producto,
+                    cantidad: cantidad,
+                });
+                setFeedbackMsg(`Agregado al carrito: ${producto.nombre} x${cantidad}`);
+            } catch (e) {
+                setFeedbackMsg('Error al agregar al carrito');
+            }
+            setModalFeedbackOpen(true);
+        })();
     };
 
     return (
@@ -240,6 +248,17 @@ export default function DetalleProducto() {
                             setModalCarrito(false);
                             navigation.navigate('Carrito', { usuario });
                         }}
+                    />
+                    {/* MODAL DE ACCESO RESTRINGIDO */}
+                    <ModalFeedback
+                        visible={modalRestringido}
+                        onClose={() => setModalRestringido(false)}
+                        titulo="Acceso restringido"
+                        mensaje="Solo los usuarios pueden agregar productos al carrito. El administrador no puede hacer compras."
+                        icono="error-outline"
+                        colorTitulo="#000000FF"
+                        textoBoton="Cerrar"
+                        onBoton={() => setModalRestringido(false)}
                     />
                     {/* FOOTER SIMULADO */}
                     <View style={{ height: 60 }} />
