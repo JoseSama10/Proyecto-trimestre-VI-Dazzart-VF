@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,10 +7,12 @@ import styles from '../../css/MisDatos';
 import Header from '../../Components/Header';
 import PerfilDropdown from '../../Components/PerfilDropdown';
 import { TouchableWithoutFeedback } from 'react-native';
+import ModalFeedback from '../../Components/ModalFeedback';
 
 export default function MisDatos({ navigation }) {
   const [usuario, setUsuario] = useState(null);
   const [menuPerfilVisible, setMenuPerfilVisible] = useState(false);
+  const [accesoRestringido, setAccesoRestringido] = useState(false);
 
 
   // MOSTRAR MENÚ DE PERFIL
@@ -106,6 +107,30 @@ export default function MisDatos({ navigation }) {
     }
     setLoading(false);
   };
+
+  // MOSTRAR MENSAJE DE ERROR SOLO SI ES ADMIN
+  if (usuario && usuario.id_rol === 1) {
+    return (
+      <>
+        <Header
+          onLoginPress={handleLoginPress}
+          onCartPress={handleCartPress}
+          onSearch={handleSearch}
+          usuario={usuario}
+        />
+        <ModalFeedback
+          visible={true}
+          onClose={() => navigation && navigation.goBack()}
+          titulo="Acceso restringido"
+          mensaje="Solo los usuarios pueden editar sus datos. El administrador no puede modificar datos personales aquí."
+          icono="error-outline"
+          colorTitulo="#000000FF"
+          textoBoton="Volver"
+          onBoton={() => navigation && navigation.goBack()}
+        />
+      </>
+    );
+  }
 
   return (
     <>
