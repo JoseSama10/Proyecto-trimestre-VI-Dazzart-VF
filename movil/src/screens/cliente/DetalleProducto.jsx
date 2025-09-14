@@ -51,18 +51,18 @@ export default function DetalleProducto() {
             return;
         }
         (async () => {
-            try {
-                await API.post('/carrito', {
-                    id_usuario: usuario.id_usuario,
-                    id_producto: producto._id || producto.id || producto.id_producto,
-                    cantidad: cantidad,
-                });
-                setFeedbackMsg(`Agregado al carrito: ${producto.nombre} x${cantidad}`);
-            } catch (e) {
-                setFeedbackMsg('Error al agregar al carrito');
-            }
-            setModalFeedbackOpen(true);
-        })();
+    try {
+        await API.post('/carrito', {
+            id_usuario: usuario.id_usuario,
+            id_producto: producto._id || producto.id || producto.id_producto,
+            cantidad: cantidad,
+        });
+        setModalCarrito(true); // ✅ abre el modal que ya tienes definido
+    } catch (e) {
+        setMensajeModal('Error al agregar al carrito');
+        setModalVisible(true);
+    }
+})();
     };
 
     return (
@@ -213,9 +213,13 @@ export default function DetalleProducto() {
                             </View>
                             {/* BOTONES */}
                             <View style={styles.btnBoxMobile}>
-                                <TouchableOpacity style={styles.btnCarritoMobile} onPress={handleAgregarCarrito}>
+                                <TouchableOpacity
+                                    style={styles.btnCarritoMobile}
+                                    onPress={() => handleAgregarCarrito(producto, cantidad)}
+                                >
                                     <Text style={styles.btnCarritoTxtMobile}>+ Añadir al carrito</Text>
                                 </TouchableOpacity>
+
                                 <TouchableOpacity style={styles.btnComprarMobile} onPress={() => Alert.alert('Funcionalidad \"Comprar ahora\" no implementada')}>
                                     <Text style={styles.btnComprarTxtMobile}>Comprar ahora</Text>
                                 </TouchableOpacity>
