@@ -61,10 +61,11 @@ const styles = StyleSheet.create({
   },
   nombre: {
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 16, // Tamaño más adecuado para la cuadrícula
     textAlign: 'center',
     marginBottom: 10,
     color: '#222',
+    minHeight: 40, // Asegura espacio para 2 líneas de texto
   },
   descripcion: {
     fontSize: 16,
