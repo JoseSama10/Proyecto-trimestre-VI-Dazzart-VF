@@ -7,10 +7,11 @@ import MenuLateral from '../../Components/MenuLateral';
 import { ProductoCard } from '../../Components/ProductosList';
 import ModalDetalleProducto from '../../Components/ModalDetalleProducto';
 import API from '../../config/api';
-import styles from '../../css/VistaProductos';
+import styles from '../../css/FiltroProductos.js';
 import ModalFeedback from '../../Components/ModalFeedback';
 import PerfilDropdown from '../../Components/PerfilDropdown';
 import ModalLogin from '../../Components/ModalLogin';
+import { FontAwesome } from '@expo/vector-icons'; // Asegúrate de tener esta línea
 
 export default function VistaProductos({ navigation, route }) {
   const [modalFeedbackOpen, setModalFeedbackOpen] = useState(false);
@@ -38,13 +39,17 @@ export default function VistaProductos({ navigation, route }) {
   const [idSubcategoria, setIdSubcategoria] = useState(route?.params?.id_subcategoria || null);
   const [showFiltros, setShowFiltros] = useState(false);
 
-  // FUNCION PARA AGREGAR PRODUCTOS AL CARRITO
-  // MOSTAR MODAL DE DETALLE PARA AGREGAR AL CARRITO
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
   const [productoAgregar, setProductoAgregar] = useState(null);
+  const [modalRestringido, setModalRestringido] = useState(false);
   const handleAgregarCarrito = (producto, cantidad = 1) => {
     if (!usuario) {
       setShowLogin(true);
+      return;
+    }
+    // SI ES ADMIN, MOSTRAR MODAL Y NO AGREGAR
+    if (usuario.id_rol === 1) {
+      setModalRestringido(true);
       return;
     }
     (async () => {
@@ -181,10 +186,14 @@ export default function VistaProductos({ navigation, route }) {
           onSelectSubcategoria={handleSelectSubcategoria}
         />
       </Modal>
-      <Text style={styles.breadcrumb}>{nombreCategoria}</Text>
-      <TouchableOpacity style={styles.filtrarBtn} onPress={() => setShowFiltros(true)}>
-        <Text style={styles.filtrarBtnTxt}>Filtrar</Text>
-      </TouchableOpacity>
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.breadcrumb}>{nombreCategoria}</Text>
+        <TouchableOpacity style={styles.filtrarBtn} onPress={() => setShowFiltros(true)}>
+          <FontAwesome name="filter" size={16} color="#333" />
+          <Text style={styles.filtrarBtnTxt}>Filtrar</Text>
+        </TouchableOpacity>
+      </View>
       <Modal visible={showFiltros} animationType="slide" transparent>
         <TouchableOpacity
           activeOpacity={1}
@@ -290,6 +299,16 @@ export default function VistaProductos({ navigation, route }) {
         outlineBoton={true}
         outlineBotonSecundario={false}
         showClose={true}
+      />
+      <ModalFeedback
+        visible={modalRestringido}
+        onClose={() => setModalRestringido(false)}
+        titulo="Acceso restringido"
+        mensaje="Solo los usuarios pueden agregar productos al carrito. El administrador no puede hacer compras."
+        icono="error-outline"
+        colorTitulo="#000000FF"
+        textoBoton="Cerrar"
+        onBoton={() => setModalRestringido(false)}
       />
       {usuario && (
         <PerfilDropdown
