@@ -59,6 +59,8 @@ export default function MisCompras({ navigation }) {
     }
     setModalConfirmarCancelar(false);
     setIdPedidoCancelar(null);
+    setModalVisible(false); 
+    setCompraSeleccionada(null); 
   };
 
   const comprasOrdenadas = compras.slice().reverse();
