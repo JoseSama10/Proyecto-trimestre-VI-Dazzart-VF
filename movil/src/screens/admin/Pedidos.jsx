@@ -33,7 +33,12 @@ export default function PedidosAdmin() {
     try {
       const res = await API.get("/pedidos");
       const data = Array.isArray(res.data) ? res.data : [];
-      setPedidos(data);
+      setPedidos(
+        data.filter(
+          (p) => !["cancelado", "entregado"].includes((p.estado || "").toLowerCase())
+        )
+      );
+
       setPaginaActual(1);
     } catch (err) {
       console.error("Error cargando pedidos:", err);
@@ -226,93 +231,93 @@ export default function PedidosAdmin() {
       </View>
 
       {/* Papelera de pedidos */}
-<Modal
-  visible={mostrarPapelera}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setMostrarPapelera(false)}
->
-  <View style={styles.papeleraOverlay}>
-    {/* Fondo clickeable para cerrar */}
-    <TouchableOpacity
-      style={StyleSheet.absoluteFillObject}
-      activeOpacity={1}
-      onPress={() => setMostrarPapelera(false)}
-    />
-
-    {/* Contenedor del modal */}
-    <View style={styles.papeleraContainer}>
-      <TouchableOpacity
-        onPress={() => setMostrarPapelera(false)}
-        style={styles.closeBtn}
+      <Modal
+        visible={mostrarPapelera}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMostrarPapelera(false)}
       >
-        <Text style={{ fontSize: 28, color: "#888" }}>×</Text>
-      </TouchableOpacity>
+        <View style={styles.papeleraOverlay}>
+          {/* Fondo clickeable para cerrar */}
+          <TouchableOpacity
+            style={StyleSheet.absoluteFillObject}
+            activeOpacity={1}
+            onPress={() => setMostrarPapelera(false)}
+          />
 
-      <Text style={styles.papeleraTitle}>Pedidos en papelera</Text>
+          {/* Contenedor del modal */}
+          <View style={styles.papeleraContainer}>
+            <TouchableOpacity
+              onPress={() => setMostrarPapelera(false)}
+              style={styles.closeBtn}
+            >
+              <Text style={{ fontSize: 28, color: "#888" }}>×</Text>
+            </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.vaciarBtn}
-        onPress={async () => {
-          Alert.alert(
-            "Vaciar papelera",
-            "¿Vaciar papelera? Esta acción eliminará definitivamente los pedidos con más de 7 días.",
-            [
-              { text: "Cancelar", style: "cancel" },
-              {
-                text: "Eliminar",
-                style: "destructive",
-                onPress: async () => {
-                  await API.delete("/pedidos/vaciar-papelera");
-                  cargarPapelera();
-                },
-              },
-            ]
-          );
-        }}
-      >
-        <Text style={{ color: "#fff", fontWeight: "bold" }}>
-          Vaciar papelera
-        </Text>
-      </TouchableOpacity>
+            <Text style={styles.papeleraTitle}>Pedidos en papelera</Text>
 
-      <FlatList
-        data={pedidosPapelera}
-        keyExtractor={(item) => item.id_factura.toString()}
-        contentContainerStyle={{ paddingVertical: 8 }}
-        ListEmptyComponent={
-          <Text style={{ textAlign: "center", marginTop: 20 }}>
-            No hay pedidos en papelera
-          </Text>
-        }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.label}>ID:</Text>
-            <Text style={styles.value}>{item.id_factura}</Text>
-            <Text style={styles.label}>Cliente:</Text>
-            <Text style={styles.value}>{item.nombre_cliente}</Text>
-            <Text style={styles.label}>Estado:</Text>
-            <Text style={styles.value}>{item.estado}</Text>
-            <Text style={styles.label}>Fecha eliminado:</Text>
-            <Text style={styles.value}>
-              {formatFechaLocal(item.fecha_eliminado)}
-            </Text>
-            <View style={styles.actions}>
-              <TouchableOpacity
-                style={styles.viewButton}
-                onPress={() =>
-                  navigation.navigate("VerFactura", { id: item.id_factura })
-                }
-              >
-                <Text style={styles.actionText}>Observar</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.vaciarBtn}
+              onPress={async () => {
+                Alert.alert(
+                  "Vaciar papelera",
+                  "¿Vaciar papelera? Esta acción eliminará definitivamente los pedidos con más de 7 días.",
+                  [
+                    { text: "Cancelar", style: "cancel" },
+                    {
+                      text: "Eliminar",
+                      style: "destructive",
+                      onPress: async () => {
+                        await API.delete("/pedidos/vaciar-papelera");
+                        cargarPapelera();
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                Vaciar papelera
+              </Text>
+            </TouchableOpacity>
+
+            <FlatList
+              data={pedidosPapelera}
+              keyExtractor={(item) => item.id_factura.toString()}
+              contentContainerStyle={{ paddingVertical: 8 }}
+              ListEmptyComponent={
+                <Text style={{ textAlign: "center", marginTop: 20 }}>
+                  No hay pedidos en papelera
+                </Text>
+              }
+              renderItem={({ item }) => (
+                <View style={styles.card}>
+                  <Text style={styles.label}>ID:</Text>
+                  <Text style={styles.value}>{item.id_factura}</Text>
+                  <Text style={styles.label}>Cliente:</Text>
+                  <Text style={styles.value}>{item.nombre_cliente}</Text>
+                  <Text style={styles.label}>Estado:</Text>
+                  <Text style={styles.value}>{item.estado}</Text>
+                  <Text style={styles.label}>Fecha eliminado:</Text>
+                  <Text style={styles.value}>
+                    {formatFechaLocal(item.fecha_eliminado)}
+                  </Text>
+                  <View style={styles.actions}>
+                    <TouchableOpacity
+                      style={styles.viewButton}
+                      onPress={() =>
+                        navigation.navigate("VerFactura", { id: item.id_factura })
+                      }
+                    >
+                      <Text style={styles.actionText}>Observar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            />
           </View>
-        )}
-      />
-    </View>
-  </View>
-</Modal>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
