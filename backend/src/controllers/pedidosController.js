@@ -19,8 +19,21 @@ exports.obtenerPedidos = async (req, res) => {
     } else {
       query += ' FROM pedidos p INNER JOIN usuario u ON p.id_usuario = u.id_usuario WHERE u.id_rol = 2';
     }
+
     const [rows] = await pool.query(query);
-    res.json(rows);
+
+    // Parsear productos
+    const pedidos = rows.map(p => {
+      let parsed = [];
+      try {
+        parsed = (typeof p.productos === 'string') ? JSON.parse(p.productos || '[]') : (p.productos || []);
+      } catch (e) {
+        parsed = [];
+      }
+      return { ...p, productos: parsed };
+    });
+
+    res.json(pedidos);
   } catch (error) {
     console.error('Error al obtener pedidos:', error);
     res.status(500).json({ error: 'Error del servidor' });
@@ -50,7 +63,14 @@ exports.obtenerPedidoPorId = async (req, res) => {
       return res.status(404).json({ error: 'Pedido no encontrado' });
     }
 
-    res.json(rows[0]);
+    const pedido = rows[0];
+    try {
+      pedido.productos = (typeof pedido.productos === 'string') ? JSON.parse(pedido.productos || '[]') : (pedido.productos || []);
+    } catch (e) {
+      pedido.productos = [];
+    }
+
+    res.json(pedido);
   } catch (error) {
     console.error('Error al obtener pedido:', error);
     res.status(500).json({ error: 'Error del servidor' });
@@ -90,7 +110,6 @@ exports.crearPedido = async (req, res) => {
         [item.cantidad, item.id_producto]
       );
     }
-
 
     // Obtener nombres, precios y descuentos igual que en carritoController
     const db = connection;
@@ -195,7 +214,17 @@ exports.obtenerPedidosPorUsuario = async (req, res) => {
       return res.status(404).json({ error: 'No se encontraron pedidos para este usuario' });
     }
 
-    res.json(rows);
+    const pedidos = rows.map(p => {
+      let parsed = [];
+      try {
+        parsed = (typeof p.productos === 'string') ? JSON.parse(p.productos || '[]') : (p.productos || []);
+      } catch (e) {
+        parsed = [];
+      }
+      return { ...p, productos: parsed };
+    });
+
+    res.json(pedidos);
   } catch (error) {
     console.error('Error al obtener pedidos por usuario:', error);
     res.status(500).json({ error: 'Error del servidor' });
