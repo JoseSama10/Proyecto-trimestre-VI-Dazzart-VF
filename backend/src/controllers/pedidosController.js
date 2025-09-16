@@ -3,7 +3,7 @@ const pool = require('../config/db');
 // Obtener todos los pedidos
 exports.obtenerPedidos = async (req, res) => {
   try {
-    let query = `
+    const [rows] = await pool.query(`
       SELECT 
         p.id_factura,
         p.direccion,
@@ -11,15 +11,10 @@ exports.obtenerPedidos = async (req, res) => {
         p.productos,
         p.total_productos,
         p.total,
-        p.estado,
-        p.fecha_pedido`;
-    // Si se pide la papelera, incluir fecha_eliminado y filtrar
-    if (req.query.papelera === '1') {
-      query += ', p.fecha_eliminado FROM pedidos p INNER JOIN usuario u ON p.id_usuario = u.id_usuario WHERE u.id_rol = 2 AND p.en_papelera = 1';
-    } else {
-      query += ' FROM pedidos p INNER JOIN usuario u ON p.id_usuario = u.id_usuario WHERE u.id_rol = 2';
-    }
-    const [rows] = await pool.query(query);
+        p.estado
+      FROM pedidos p
+      INNER JOIN usuario u ON p.id_usuario = u.id_usuario
+    `);
     res.json(rows);
   } catch (error) {
     console.error('Error al obtener pedidos:', error);
@@ -39,8 +34,7 @@ exports.obtenerPedidoPorId = async (req, res) => {
         p.productos,
         p.total_productos,
         p.total,
-        p.estado,
-        p.fecha_pedido
+        p.estado
       FROM pedidos p
       INNER JOIN usuario u ON p.id_usuario = u.id_usuario
       WHERE p.id_factura = ?
@@ -91,67 +85,24 @@ exports.crearPedido = async (req, res) => {
       );
     }
 
+    // Obtener nombres y precios reales de los productos
+    const productosConNombre = await Promise.all(
+      productos.map(async (item) => {
+        const [result] = await connection.query(
+          'SELECT nombre, precio FROM producto WHERE id_producto = ?',
+          [item.id_producto]
+        );
 
-    // Obtener nombres, precios y descuentos igual que en carritoController
-    const db = connection;
-    const productosConDescuento = await Promise.all(productos.map(async (item) => {
-      const [prodRows] = await db.query(
-        'SELECT nombre, precio, id_categoria FROM producto WHERE id_producto = ?',
-        [item.id_producto]
-      );
-      const prod = prodRows[0] || {};
-      const precioOriginal = parseFloat(prod.precio) || 0;
-      let precioFinal = precioOriginal;
-      let descuentoAplicado = null;
+        return {
+          id_producto: item.id_producto,
+          cantidad: item.cantidad,
+          nombre: result[0]?.nombre || 'Desconocido',
+          precio: result[0]?.precio || 0
+        };
+      })
+    );
 
-      // Buscar descuento por producto
-      const [descProducto] = await db.query(`
-        SELECT d.tipo_descuento, d.valor
-        FROM descuento d
-        JOIN descuento_producto dp ON d.id_descuento = dp.id_descuento
-        WHERE dp.id_producto = ? AND d.estado_descuento = 'Activo'`, [item.id_producto]);
-
-      if (descProducto.length > 0) {
-        const { tipo_descuento, valor } = descProducto[0];
-        const tipo = tipo_descuento.toLowerCase();
-        const val = parseFloat(valor);
-        descuentoAplicado = { tipo_descuento, valor: val, origen: 'producto' };
-        if (tipo === 'porcentaje') {
-          precioFinal = precioOriginal - (precioOriginal * val / 100);
-        } else if (tipo === 'fijo') {
-          precioFinal = precioOriginal - val;
-        }
-      } else {
-        // Buscar descuento por categoría
-        const [descCategoria] = await db.query(`
-          SELECT d.tipo_descuento, d.valor
-          FROM descuento d
-          JOIN descuento_categoria dc ON d.id_descuento = dc.id_descuento
-          WHERE dc.id_categoria = ? AND d.estado_descuento = 'Activo'`, [prod.id_categoria]);
-        if (descCategoria.length > 0) {
-          const { tipo_descuento, valor } = descCategoria[0];
-          const tipo = tipo_descuento.toLowerCase();
-          const val = parseFloat(valor);
-          descuentoAplicado = { tipo_descuento, valor: val, origen: 'categoria' };
-          if (tipo === 'porcentaje') {
-            precioFinal = precioOriginal - (precioOriginal * val / 100);
-          } else if (tipo === 'fijo') {
-            precioFinal = precioOriginal - val;
-          }
-        }
-      }
-      if (isNaN(precioFinal)) precioFinal = precioOriginal;
-      return {
-        id_producto: item.id_producto,
-        cantidad: item.cantidad,
-        nombre: prod.nombre || 'Desconocido',
-        precio_original: precioOriginal,
-        precio_final: parseFloat(precioFinal.toFixed(2)),
-        descuento: descuentoAplicado
-      };
-    }));
-
-    const productosJSON = JSON.stringify(productosConDescuento);
+    const productosJSON = JSON.stringify(productosConNombre);
 
     // Insertar pedido con productos serializados como JSON
     const [result] = await connection.query(
@@ -184,8 +135,7 @@ exports.obtenerPedidosPorUsuario = async (req, res) => {
         p.productos,
         p.total_productos,
         p.total,
-        p.estado,
-        p.fecha_pedido
+        p.estado
       FROM pedidos p
       INNER JOIN usuario u ON p.id_usuario = u.id_usuario
       WHERE p.id_usuario = ?
@@ -207,15 +157,51 @@ exports.cancelarPedido = async (req, res) => {
   const { id_factura } = req.params;
 
   try {
-    // Cambiar estado a cancelado y mover a papelera
-    const [result] = await pool.query(
-      'UPDATE pedidos SET estado = ?, en_papelera = 1, fecha_eliminado = NOW() WHERE id_factura = ?',
-      ['cancelado', id_factura]
+    // Obtener pedido y estado
+    const [pedidoData] = await pool.query(
+      'SELECT productos, estado FROM pedidos WHERE id_factura = ?',
+      [id_factura]
     );
-    if (result.affectedRows === 0) {
+
+    if (pedidoData.length === 0) {
       return res.status(404).json({ error: 'Pedido no encontrado' });
     }
-    res.json({ message: 'Pedido cancelado y movido a papelera' });
+
+    const pedido = pedidoData[0];
+
+    if (pedido.estado === 'cancelado') {
+      return res.status(400).json({ error: 'El pedido ya está cancelado' });
+    }
+
+    // Parsear productos JSON
+    let productos = [];
+    try {
+      productos = JSON.parse(pedido.productos);
+    } catch (error) {
+      return res.status(400).json({ error: 'Error al procesar los productos del pedido' });
+    }
+
+    // Reintegrar stock
+    for (const prod of productos) {
+      const idProducto = prod.id_producto;
+      const cantidad = prod.cantidad;
+
+      if (!idProducto || typeof cantidad !== 'number') continue;
+
+      await pool.query(
+        'UPDATE producto SET stock = stock + ? WHERE id_producto = ?',
+        [cantidad, idProducto]
+      );
+    }
+
+    // Cambiar estado a cancelado
+    await pool.query(
+      'UPDATE pedidos SET estado = ? WHERE id_factura = ?',
+      ['cancelado', id_factura]
+    );
+
+    res.json({ message: 'Pedido cancelado y productos reingresados al stock' });
+
   } catch (error) {
     console.error('Error al cancelar pedido:', error);
     res.status(500).json({ error: 'Error al cancelar el pedido' });
@@ -234,9 +220,9 @@ exports.actualizarEstadoPedido = async (req, res) => {
   }
 
   try {
-    // Verificar existencia, estado actual y si está en papelera
+    // Verificar existencia y estado actual
     const [rows] = await pool.query(
-      'SELECT estado, en_papelera FROM pedidos WHERE id_factura = ?',
+      'SELECT estado FROM pedidos WHERE id_factura = ?',
       [id_factura]
     );
 
@@ -246,53 +232,19 @@ exports.actualizarEstadoPedido = async (req, res) => {
 
     const pedido = rows[0];
 
-    if (pedido.estado === 'cancelado' || pedido.en_papelera === 1) {
-      return res.status(400).json({ error: 'No se puede cambiar el estado de un pedido cancelado, entregado o en papelera' });
+    if (pedido.estado === 'cancelado') {
+      return res.status(400).json({ error: 'No se puede cambiar el estado de un pedido cancelado' });
     }
 
-    // Si el nuevo estado es entregado, mover a papelera
-    if (nuevo_estado === 'entregado') {
-      await pool.query(
-        'UPDATE pedidos SET estado = ?, en_papelera = 1, fecha_eliminado = NOW() WHERE id_factura = ?',
-        [nuevo_estado, id_factura]
-      );
-    } else {
-      // Solo actualizar estado
-      await pool.query(
-        'UPDATE pedidos SET estado = ? WHERE id_factura = ?',
-        [nuevo_estado, id_factura]
-      );
-    }
+    // Actualizar estado
+    await pool.query(
+      'UPDATE pedidos SET estado = ? WHERE id_factura = ?',
+      [nuevo_estado, id_factura]
+    );
 
     res.json({ message: 'Estado actualizado correctamente' });
   } catch (error) {
     console.error('Error al actualizar estado del pedido:', error);
     res.status(500).json({ error: 'Error del servidor al actualizar el estado' });
-  }
-};
-
-// Vaciar papelera: eliminar pedidos en papelera con más de 7 días
-exports.vaciarPapelera = async (req, res) => {
-  try {
-    const [result] = await pool.query(
-      "DELETE FROM pedidos WHERE en_papelera = 1 AND fecha_eliminado <= DATE_SUB(NOW(), INTERVAL 7 DAY)"
-    );
-    res.json({ message: "Pedidos en papelera eliminados definitivamente", deleted: result.affectedRows });
-  } catch (error) {
-    res.status(500).json({ error: "Error al vaciar la papelera" });
-  }
-};
-
-// Restaurar pedido desde la papelera
-exports.restaurarPedido = async (req, res) => {
-  const { id_factura } = req.params;
-  try {
-    await pool.query(
-      "UPDATE pedidos SET en_papelera = 0, fecha_eliminado = NULL, estado = 'pendiente' WHERE id_factura = ?",
-      [id_factura]
-    );
-    res.json({ message: "Pedido restaurado correctamente" });
-  } catch (error) {
-    res.status(500).json({ error: "Error al restaurar el pedido" });
   }
 };

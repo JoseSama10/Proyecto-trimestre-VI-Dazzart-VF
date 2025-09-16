@@ -7,9 +7,7 @@ const {
   crearPedido,
   obtenerPedidosPorUsuario,
   cancelarPedido,
-  actualizarEstadoPedido,
-  vaciarPapelera,
-  restaurarPedido
+  actualizarEstadoPedido
 } = require('../controllers/pedidosController');
 
 router.get('/', obtenerPedidos);
@@ -18,7 +16,5 @@ router.put('/actualizar-estado/:id_factura', actualizarEstadoPedido);
 router.put('/cancelar/:id_factura', cancelarPedido);
 router.get('/:id', obtenerPedidoPorId);
 router.post('/', crearPedido);
-router.delete('/vaciar-papelera', vaciarPapelera);
-router.put('/restaurar/:id_factura', restaurarPedido);
 
 module.exports = router;

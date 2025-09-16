@@ -81,7 +81,7 @@ export default function VerFactura() {
         style={{ minHeight: "80vh", marginLeft: "280px" }}
       >
         <div className="card p-4 shadow" style={{ width: "500px" }}>
-          <h2 className="text-center mb-4">Detalle Pedido</h2>
+          <h2 className="text-center mb-4">Detalle de Factura</h2>
           <ul className="list-group list-group-flush">
             <li className="list-group-item"><strong>ID:</strong> {factura.id_factura}</li>
             <li className="list-group-item"><strong>Nombre:</strong> {factura.nombre_cliente}</li>
@@ -105,8 +105,8 @@ export default function VerFactura() {
             </li>
             <li className="list-group-item">
               <strong>Estado:</strong>{" "}
-              {(factura.estado === "cancelado" || factura.estado === "entregado") ? (
-                <span className={`badge bg-${factura.estado === "cancelado" ? "danger" : "success"}`}>{factura.estado}</span>
+              {factura.estado === "cancelado" ? (
+                <span className="badge bg-danger">cancelado</span>
               ) : (
                 <>
                   <select
