@@ -11,11 +11,13 @@ export default function EstadisticasAdmin() {
     totalClientes: 0,
     totalProductos: 0,
     productosMasVendidos: [],
+    productosMenosVendidos: [],
     stockTotal: 0
   });
   const [mostrarStock, setMostrarStock] = useState(false);
+  const [mostrarMenosVendidos, setMostrarMenosVendidos] = useState(false); 
   const [productos, setProductos] = useState([]);
-  const [showMenu, setShowMenu] = useState(false); // Estado para el menú lateral
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const cargarEstadisticas = async () => {
@@ -34,6 +36,7 @@ export default function EstadisticasAdmin() {
         const totalPedidos = pedidos.length;
         const clientesUnicos = new Set(pedidos.map(p => p.nombre_cliente)).size;
 
+        // CALCULAR PRODUCTOS MENOS VENDIDOS Y MAS VENDIDOS
         const productosVendidos = {};
         pedidosValidos.forEach(p => {
           if (!p.productos) return;
@@ -44,14 +47,32 @@ export default function EstadisticasAdmin() {
             return;
           }
           productosArray.forEach(prod => {
+            const id = String(prod.id_producto || prod.id || prod._id);
             const nombre = prod.nombre?.trim() || 'Desconocido';
             const cantidad = Number(prod.cantidad) || 0;
-            productosVendidos[nombre] = (productosVendidos[nombre] || 0) + cantidad;
+            if (!productosVendidos[id]) {
+              productosVendidos[id] = { nombre, vendidos: 0 };
+            }
+            productosVendidos[id].vendidos += cantidad;
           });
         });
 
-        const productosMasVendidos = Object.entries(productosVendidos)
-          .map(([nombre, vendidos]) => ({ nombre, vendidos }))
+        const todosProductos = productos.map(p => {
+          const idStr = String(p.id_producto);
+          const vendido = productosVendidos[idStr];
+          return {
+            id_producto: p.id_producto,
+            nombre: p.nombre,
+            vendidos: vendido ? vendido.vendidos : 0
+          };
+        });
+
+        const productosNuncaVendidos = todosProductos.filter(p => p.vendidos === 0);
+        const productosMenosVendidos = productosNuncaVendidos.length > 0
+          ? productosNuncaVendidos
+          : todosProductos.sort((a, b) => a.vendidos - b.vendidos).slice(0, 5);
+
+        const productosMasVendidos = Object.values(productosVendidos)
           .sort((a, b) => b.vendidos - a.vendidos)
           .slice(0, 5);
 
@@ -61,10 +82,10 @@ export default function EstadisticasAdmin() {
           totalClientes: clientesUnicos,
           totalProductos: productos.reduce((acc, p) => acc + Number(p.stock || 0), 0),
           productosMasVendidos,
+          productosMenosVendidos,
           stockTotal: productos.reduce((acc, p) => acc + Number(p.stock || 0), 0)
         });
       } catch (_error) {
-        // Manejo de error
       }
     };
 
@@ -81,7 +102,6 @@ export default function EstadisticasAdmin() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f9fa" }}>
-      {/* Barra superior con botón de menú y título */}
       <View style={styles.headerBar}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -92,7 +112,6 @@ export default function EstadisticasAdmin() {
         <Text style={styles.headerTitle}>Estadísticas del eCommerce</Text>
       </View>
 
-      {/* Menú lateral como modal */}
       <Modal
         visible={showMenu}
         transparent
@@ -138,9 +157,21 @@ export default function EstadisticasAdmin() {
             <Text style={[styles.statLabel, { color: "#333" }]}>Stock total disponible</Text>
             <Text style={[styles.statValue, { color: "#333" }]}>{estadisticas.totalProductos}</Text>
           </TouchableOpacity>
+
+          
+          {/* CARD DE PRODUCTOS MENOS VENDIDOS */}
+          <TouchableOpacity
+            style={[styles.statCard, { backgroundColor: "#AC0818FF" }]}
+            onPress={() => setMostrarMenosVendidos(true)}
+            activeOpacity={0.8}
+          >
+            <Icon name="exclamation-circle" size={28} color="#FFF" style={styles.statIcon} />
+            <Text style={styles.statLabel}>Productos Menos Vendidos</Text>
+
+          </TouchableOpacity>
         </View>
 
-        {/* Modal de stock por producto */}
+        {/* MODAL DE STOCK DE PRODUCTOS */}
         <Modal visible={mostrarStock} transparent animationType="fade">
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -153,7 +184,7 @@ export default function EstadisticasAdmin() {
               <Text style={styles.modalTitle}>Stock por producto</Text>
               <FlatList
                 data={productos}
-                keyExtractor={item => item.id_producto?.toString() || item.id?.toString()}
+                keyExtractor={item => item.id_producto?.toString() || item.nombre + Math.random()}
                 style={{ marginTop: 10 }}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 ListHeaderComponent={
@@ -176,18 +207,51 @@ export default function EstadisticasAdmin() {
         </Modal>
 
         <Text style={styles.subtitle}>
-          <Icon name="star" size={20} color="#ffc107" /> Productos Más Vendidos
+          <Icon name="star" size={20} color="#ffc107" /> Productos Mas Vendidos
         </Text>
         <View style={styles.tableHeader}>
           <Text style={[styles.tableCell, { flex: 2, fontWeight: "bold" }]}>Producto</Text>
           <Text style={[styles.tableCell, { flex: 1, fontWeight: "bold" }]}>Unidades Vendidas</Text>
         </View>
-        {estadisticas.productosMasVendidos.map((prod) => (
-          <View style={styles.tableRow} key={prod.nombre}>
+        {estadisticas.productosMasVendidos.map((prod, idx) => (
+          <View style={styles.tableRow} key={prod.id_producto || prod.nombre + idx}>
             <Text style={[styles.tableCell, { flex: 2 }]}>{prod.nombre}</Text>
             <Text style={[styles.tableCell, { flex: 1 }]}>{prod.vendidos}</Text>
           </View>
         ))}
+
+        {/* Modal de productos menos vendidos */}
+        <Modal visible={mostrarMenosVendidos} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                onPress={() => setMostrarMenosVendidos(false)}
+                style={styles.closeBtn}
+              >
+                <Text style={{ fontSize: 24, color: "#888" }}>&times;</Text>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Productos Menos Vendidos</Text>
+              <FlatList
+                data={estadisticas.productosMenosVendidos}
+                keyExtractor={item => item.nombre}
+                style={{ marginTop: 10 }}
+                contentContainerStyle={{ paddingBottom: 20 }}
+                ListHeaderComponent={
+                  <View style={styles.tableHeader}>
+                    <Text style={[styles.tableCell, { flex: 2, fontWeight: "bold" }]}>Productos</Text>
+                    <Text style={[styles.tableCell, { flex: 1, fontWeight: "bold" }]}>Unidades Vendidas</Text>
+                  </View>
+                }
+                renderItem={({ item }) => (
+                  <View style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 2 }]}>{item.nombre}</Text>
+                    <Text style={[styles.tableCell, { flex: 1 }]}>{item.vendidos}</Text>
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
