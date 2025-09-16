@@ -91,6 +91,8 @@ CREATE TABLE pedidos (
   total DECIMAL(10,2) NOT NULL,
   estado VARCHAR(50) NOT NULL,
   fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  en_papelera TINYINT(1) DEFAULT 0,
+  fecha_eliminado DATETIME DEFAULT NULL,
   FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
