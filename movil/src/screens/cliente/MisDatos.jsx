@@ -43,10 +43,8 @@ export default function MisDatos({ navigation }) {
   };
   const [form, setForm] = useState({
     nombre: '',
-    nombre_usuario: '',
     correo_electronico: '',
     telefono: '',
-    cedula: '',
     direccion: '',
     contrasena: '',
   });
@@ -65,10 +63,8 @@ export default function MisDatos({ navigation }) {
       setUsuario(user);
       setForm({
         nombre: user.nombre || '',
-        nombre_usuario: user.nombre_usuario || '',
         correo_electronico: user.correo_electronico || '',
         telefono: user.telefono || '',
-        cedula: user.cedula || '',
         direccion: user.direccion || '',
         contrasena: '',
       });
@@ -85,10 +81,8 @@ export default function MisDatos({ navigation }) {
     try {
       const datosEnviar = {
         nombre: form.nombre.trim() || usuario.nombre,
-        nombre_usuario: form.nombre_usuario.trim() || usuario.nombre_usuario,
         correo_electronico: form.correo_electronico.trim() || usuario.correo_electronico,
         telefono: form.telefono.trim() || usuario.telefono,
-        cedula: form.cedula.trim() || usuario.cedula,
         direccion: form.direccion.trim() || usuario.direccion,
         contrasena: form.contrasena.trim(),
       };
@@ -167,16 +161,6 @@ export default function MisDatos({ navigation }) {
             />
           </View>
           <View style={styles.formGroup}>
-            <FontAwesome name="user" size={22} color="#989898FF" style={styles.icon} />
-            <TextInput
-              style={[styles.input, { color: '#989898FF' }]}
-              placeholder="Usuario"
-              placeholderTextColor="#989898FF"
-              value={form.nombre_usuario}
-              onChangeText={v => handleChange('nombre_usuario', v)}
-            />
-          </View>
-          <View style={styles.formGroup}>
             <MaterialIcons name="email" size={22} color="#989898FF" style={styles.icon} />
             <TextInput
               style={[styles.input, { color: '#989898FF' }]}
@@ -197,17 +181,6 @@ export default function MisDatos({ navigation }) {
               value={form.telefono}
               onChangeText={v => handleChange('telefono', v)}
               keyboardType="phone-pad"
-            />
-          </View>
-          <View style={styles.formGroup}>
-            <FontAwesome name="id-card" size={22} color="#989898FF" style={styles.icon} />
-            <TextInput
-              style={[styles.input, { color: '#989898FF' }]}
-              placeholder="Cédula"
-              placeholderTextColor="#989898FF"
-              value={form.cedula}
-              onChangeText={v => handleChange('cedula', v)}
-              keyboardType="numeric"
             />
           </View>
           <View style={styles.formGroup}>
