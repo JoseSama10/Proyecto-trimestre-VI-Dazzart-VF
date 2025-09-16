@@ -133,7 +133,7 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 							onBoton={() => {
 								setShowBienvenida(false);
 								onClose && onClose();
-								navigation.replace('Categorias');
+								navigation.replace('Estadisticas');
 							}}
 							showClose={false}
 						/>
