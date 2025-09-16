@@ -1,4 +1,3 @@
--- 1. Crear base de datos
 DROP DATABASE IF EXISTS DAZZART;
 CREATE DATABASE DAZZART;
 USE DAZZART;
@@ -18,14 +17,13 @@ DROP TABLE IF EXISTS usuario;
 DROP TABLE IF EXISTS roles;
 
 
-
 -- Tabla de roles
 CREATE TABLE roles (
   id_rol INT AUTO_INCREMENT PRIMARY KEY,
   nombre_rol VARCHAR(50) NOT NULL
 );
 
--- Tabla de usuarios
+-- Tabla de usuarios (con campo estado)
 CREATE TABLE usuario (
   id_usuario INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL,
@@ -35,6 +33,7 @@ CREATE TABLE usuario (
   contrasena VARCHAR(255) NOT NULL,
   cedula VARCHAR(255) NOT NULL,
   direccion VARCHAR(255) NOT NULL,
+  estado ENUM('Activo','Inactivo') NOT NULL DEFAULT 'Activo', -- 👈 agregado
   id_rol INT NOT NULL,
   FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
 );
@@ -82,7 +81,7 @@ CREATE TABLE carrito (
   FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
 );
 
--- Tabla de pedidos con ON DELETE CASCADE
+-- Tabla de pedidos 
 CREATE TABLE pedidos (
   id_factura INT AUTO_INCREMENT PRIMARY KEY,
   id_usuario INT NOT NULL,
@@ -92,7 +91,9 @@ CREATE TABLE pedidos (
   total DECIMAL(10,2) NOT NULL,
   estado VARCHAR(50) NOT NULL,
   fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
+  en_papelera TINYINT(1) DEFAULT 0,
+  fecha_eliminado DATETIME DEFAULT NULL,
+  FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 -- Tabla de facturas (pagadas)
