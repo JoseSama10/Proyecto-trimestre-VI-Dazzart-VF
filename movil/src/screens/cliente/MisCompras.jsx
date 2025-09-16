@@ -139,43 +139,43 @@ export default function MisCompras({ navigation }) {
                   }}
                   activeOpacity={0.85}
                 >
-                <View style={cardStyles.cardHeader}>
-                  <Text style={cardStyles.cardTitle}>
-                    Pedido # {compra.id_factura}
-                  </Text>
-                  <Text style={[cardStyles.cardEstado, compra.estado === 'pendiente' && { backgroundColor: '#FFD600', color: '#23272f', fontWeight: 'bold', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 2, overflow: 'hidden' }]}>
-                    {compra.estado}
-                  </Text>
-                </View>
-                {(() => {
-                  let productos = compraConProductos.productos;
-                  let totalOriginal = 0;
-                  let totalDescuento = 0;
-                  if (Array.isArray(productos)) {
-                    productos.forEach(prod => {
-                      const precioOriginal = Number(prod.precio_original ?? prod.precio) || 0;
-                      const precioFinal = Number(prod.precio_final ?? prod.precio) || 0;
-                      const cantidad = Number(prod.cantidad) || 0;
-                      totalOriginal += precioOriginal * cantidad;
-                      totalDescuento += precioFinal * cantidad;
-                    });
-                  }
-                  if (totalDescuento < totalOriginal) {
-                    return (
-                      <Text style={{ color: '#444', marginBottom: 4 }}>
-                        Total: <Text style={{ color: '#888', textDecorationLine: 'line-through', fontWeight: 'normal' }}>{`$${totalOriginal.toLocaleString('es-CO')}`}</Text> <Text style={{ color: '#d32f2f', fontWeight: 'bold' }}>{`$${totalDescuento.toLocaleString('es-CO')}`}</Text>
-                      </Text>
-                    );
-                  } else {
-                    return (
-                      <Text style={{ color: '#444', marginBottom: 4 }}>
-                        Total: <Text style={{ fontWeight: 'bold' }}>{`$${totalOriginal.toLocaleString('es-CO')}`}</Text>
-                      </Text>
-                    );
-                  }
-                })()}
-                <Text style={{ color: '#888', fontSize: 13 }}>Dirección: {compra.direccion}</Text>
-              </TouchableOpacity>
+                  <View style={cardStyles.cardHeader}>
+                    <Text style={cardStyles.cardTitle}>
+                      Pedido # {compra.id_factura}
+                    </Text>
+                    <Text style={[cardStyles.cardEstado, compra.estado === 'pendiente' && { backgroundColor: '#FFD600', color: '#23272f', fontWeight: 'bold', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 2, overflow: 'hidden' }]}>
+                      {compra.estado}
+                    </Text>
+                  </View>
+                  {(() => {
+                    let productos = compraConProductos.productos;
+                    let totalOriginal = 0;
+                    let totalDescuento = 0;
+                    if (Array.isArray(productos)) {
+                      productos.forEach(prod => {
+                        const precioOriginal = Number(prod.precio_original ?? prod.precio) || 0;
+                        const precioFinal = Number(prod.precio_final ?? prod.precio) || 0;
+                        const cantidad = Number(prod.cantidad) || 0;
+                        totalOriginal += precioOriginal * cantidad;
+                        totalDescuento += precioFinal * cantidad;
+                      });
+                    }
+                    if (totalDescuento < totalOriginal) {
+                      return (
+                        <Text style={{ color: '#444', marginBottom: 4 }}>
+                          Total: <Text style={{ color: '#888', textDecorationLine: 'line-through', fontWeight: 'normal' }}>{`$${totalOriginal.toLocaleString('es-CO')}`}</Text> <Text style={{ color: '#d32f2f', fontWeight: 'bold' }}>{`$${totalDescuento.toLocaleString('es-CO')}`}</Text>
+                        </Text>
+                      );
+                    } else {
+                      return (
+                        <Text style={{ color: '#444', marginBottom: 4 }}>
+                          Total: <Text style={{ fontWeight: 'bold' }}>{`$${totalOriginal.toLocaleString('es-CO')}`}</Text>
+                        </Text>
+                      );
+                    }
+                  })()}
+                  <Text style={{ color: '#888', fontSize: 13 }}>Dirección: {compra.direccion}</Text>
+                </TouchableOpacity>
               );
             })}
           </ScrollView>
@@ -190,7 +190,7 @@ export default function MisCompras({ navigation }) {
       >
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.18)', justifyContent: 'center', alignItems: 'center' }}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={() => { }}>
               <View style={{ backgroundColor: '#f5f6fa', borderRadius: 14, padding: 18, minWidth: 320, maxWidth: 470, width: '95%' }}>
                 <Text style={{ fontWeight: 'bold', fontSize: 26, marginBottom: 18, color: '#23272f', textAlign: 'center' }}>Detalle Pedido</Text>
                 {compraSeleccionada && (
@@ -289,7 +289,7 @@ export default function MisCompras({ navigation }) {
                           <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 20 }}>Cancelar</Text>
                         </TouchableOpacity>
                       )}
-                      
+
                     </View>
                   </View>
                 )}
@@ -312,16 +312,18 @@ export default function MisCompras({ navigation }) {
         onBotonSecundario={confirmarCancelarPedido}
       />
 
-      <ModalFeedback
-        visible={true}
-        onClose={() => navigation && navigation.goBack()}
-        titulo="Acceso restringido"
-        mensaje="Solo los usuarios pueden hacer y ver pedidos. El administrador no puede realizar compras."
-        icono="error-outline"
-        colorTitulo="#000000FF"
-        textoBoton="Volver"
-        onBoton={() => navigation && navigation.goBack()}
-      />
+      {usuario?.id_rol === 1 && (
+        <ModalFeedback
+          visible={true}
+          onClose={() => navigation && navigation.goBack()}
+          titulo="Acceso restringido"
+          mensaje="Solo los usuarios pueden hacer y ver pedidos. El administrador no puede realizar compras."
+          icono="error-outline"
+          colorTitulo="#000000FF"
+          textoBoton="Volver"
+          onBoton={() => navigation && navigation.goBack()}
+        />
+      )}
     </View>
   );
 }
