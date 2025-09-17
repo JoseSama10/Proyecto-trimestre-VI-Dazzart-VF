@@ -10,7 +10,7 @@ import {
   Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome6";
-import API from "../../config/api"; // usa tu config de axios
+import API from "../../config/api"; 
 import MenuLateral from "../../Components/Admin/MenuLateral";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
@@ -20,7 +20,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 export default function EditarDescuento() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { id } = route.params; // recibes el id del descuento desde navigation
+  const { id } = route.params; 
 
   const [form, setForm] = useState({
     tipo_descuento: "Porcentaje",
@@ -31,7 +31,7 @@ export default function EditarDescuento() {
   });
 
   const [showMenu, setShowMenu] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(null); // "inicio" | "fin"
+  const [showDatePicker, setShowDatePicker] = useState(null); 
 
   useEffect(() => {
     API.get(`/descuentos/${id}`)
@@ -56,8 +56,22 @@ export default function EditarDescuento() {
   };
 
   const handleSubmit = async () => {
-    if (form.fecha_fin < form.fecha_inicio) {
+    const hoy = new Date().toISOString().split("T")[0]; // fecha actual YYYY-MM-DD
+    const fechaInicio = form.fecha_inicio.toISOString().split("T")[0];
+    const fechaFin = form.fecha_fin.toISOString().split("T")[0];
+
+    //  Validación de rango
+    if (fechaFin < fechaInicio) {
       Alert.alert("Error", "La fecha de fin no puede ser anterior a la de inicio.");
+      return;
+    }
+
+    //  Validación especial: no dejar activar descuentos expirados
+    if (fechaFin < hoy && form.estado_descuento === "Activo") {
+      Alert.alert(
+        "Error",
+        "El descuento ya expiró. Debes actualizar las fechas a un rango válido antes de poder activarlo."
+      );
       return;
     }
 
@@ -162,7 +176,11 @@ export default function EditarDescuento() {
           value={showDatePicker === "inicio" ? form.fecha_inicio : form.fecha_fin}
           mode="date"
           display="default"
-          minimumDate={new Date()}
+          minimumDate={
+            showDatePicker === "inicio"
+              ? new Date()                //  inicio >= hoy
+              : form.fecha_inicio         //  fin >= inicio
+          }
           onChange={(event, selectedDate) => {
             setShowDatePicker(null);
             if (selectedDate) {

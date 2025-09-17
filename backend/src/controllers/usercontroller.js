@@ -50,7 +50,7 @@ exports.listarUsuarios = async (req, res) => {
     `);
     res.json(rows);
   } catch (error) {
-    console.error('Error en listarUsuarios:', error); // 👈 muestra el error en consola
+    console.error('Error en listarUsuarios:', error); //  muestra el error en consola
     res.status(500).json({ error: 'Error al obtener los usuarios' });
   }
 };
