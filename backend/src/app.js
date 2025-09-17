@@ -53,7 +53,7 @@ const createApp = () => {
   app.use('/api/usuarios', userRoutes);
   app.use('/api/descuentos', descuentoRoutes);
 
-  // Imágenes estáticas
+  // Imágenes
   app.use('/productos/img', express.static(path.join(__dirname, '../public/img')));
 
    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

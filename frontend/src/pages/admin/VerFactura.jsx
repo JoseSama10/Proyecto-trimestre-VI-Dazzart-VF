@@ -94,7 +94,7 @@ export default function VerFactura() {
                   : factura.productos
                 ).map((prod, index) => (
                   <li key={index}>
-                    {prod.nombre} (x{prod.cantidad}) - ${Number(prod.precio).toLocaleString("es-CO")}
+                    {prod.nombre} (x{prod.cantidad}) - ${Number(prod.precio_final ?? prod.precio ?? 0).toLocaleString("es-CO")}
                   </li>
                 ))}
               </ul>

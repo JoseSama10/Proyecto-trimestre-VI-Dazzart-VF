@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { RefreshControl, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../../config/api';
 import styles from '../../css/MisCompras';
@@ -19,6 +20,7 @@ export default function MisCompras({ navigation }) {
   const [idPedidoCancelar, setIdPedidoCancelar] = useState(null);
   const [pagina, setPagina] = useState(1);
   const [busqueda, setBusqueda] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   const comprasPorPagina = 10;
   const totalPaginas = Math.ceil(compras.length / comprasPorPagina);
@@ -30,16 +32,23 @@ export default function MisCompras({ navigation }) {
   const handleMisDatos = () => { setMenuPerfilVisible(false); navigation && navigation.navigate('MisDatos'); };
   const handleLogout = async () => { setMenuPerfilVisible(false); await AsyncStorage.removeItem('usuario'); navigation && navigation.navigate('Index'); };
 
-  useEffect(() => {
-    (async () => {
-      const userStr = await AsyncStorage.getItem('usuario');
-      if (!userStr) return;
-      const user = JSON.parse(userStr);
-      setUsuario(user);
-      const res = await API.get(`/pedidos/usuario/${user.id_usuario}`);
-      setCompras(res.data || []);
-    })();
+  const cargarCompras = useCallback(async () => {
+    setRefreshing(true);
+    const userStr = await AsyncStorage.getItem('usuario');
+    if (!userStr) {
+      setRefreshing(false);
+      return;
+    }
+    const user = JSON.parse(userStr);
+    setUsuario(user);
+    const res = await API.get(`/pedidos/usuario/${user.id_usuario}`);
+    setCompras(res.data || []);
+    setRefreshing(false);
   }, []);
+
+  useEffect(() => {
+    cargarCompras();
+  }, [cargarCompras]);
 
   const handleCancelar = (id_factura) => {
     setIdPedidoCancelar(id_factura);
@@ -59,8 +68,8 @@ export default function MisCompras({ navigation }) {
     }
     setModalConfirmarCancelar(false);
     setIdPedidoCancelar(null);
-    setModalVisible(false); 
-    setCompraSeleccionada(null); 
+    setModalVisible(false);
+    setCompraSeleccionada(null);
   };
 
   const comprasOrdenadas = compras.slice().reverse();
@@ -121,7 +130,12 @@ export default function MisCompras({ navigation }) {
               <Text style={{ color: '#1976d2', fontWeight: 'bold', fontSize: 16 }}>Siguiente</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView style={{ marginBottom: 10 }}>
+          <ScrollView
+            style={{ marginBottom: 10 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={cargarCompras} />
+            }
+          >
             {comprasPaginadas.map((compra, idx, arr) => {
               let compraConProductos = { ...compra };
               if (typeof compraConProductos.productos === 'string') {

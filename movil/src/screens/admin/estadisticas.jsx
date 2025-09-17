@@ -40,12 +40,7 @@ export default function EstadisticasAdmin() {
         const productosVendidos = {};
         pedidosValidos.forEach(p => {
           if (!p.productos) return;
-          let productosArray = [];
-          try {
-            productosArray = JSON.parse(p.productos);
-          } catch (_error) {
-            return;
-          }
+          let productosArray = Array.isArray(p.productos) ? p.productos : [];
           productosArray.forEach(prod => {
             const id = String(prod.id_producto || prod.id || prod._id);
             const nombre = prod.nombre?.trim() || 'Desconocido';
@@ -67,12 +62,17 @@ export default function EstadisticasAdmin() {
           };
         });
 
+        // PRODUCTOS NUNCA VENDIDOS
         const productosNuncaVendidos = todosProductos.filter(p => p.vendidos === 0);
+
+        // MENOS VENDIDOS: PRIMERO LOS NUNCA VENDIDOS, SI NO HAY, LOS CON MENOS VENTAS
         const productosMenosVendidos = productosNuncaVendidos.length > 0
           ? productosNuncaVendidos
           : todosProductos.sort((a, b) => a.vendidos - b.vendidos).slice(0, 5);
 
-        const productosMasVendidos = Object.values(productosVendidos)
+        // MAS VENDIDOS 
+        const productosMasVendidos = todosProductos
+          .filter(p => p.vendidos > 0)
           .sort((a, b) => b.vendidos - a.vendidos)
           .slice(0, 5);
 

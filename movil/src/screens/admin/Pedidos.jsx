@@ -15,7 +15,7 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome6";
 import API from "../../config/api";
 import MenuLateral from "../../Components/Admin/MenuLateral";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 export default function PedidosAdmin() {
   const [pedidos, setPedidos] = useState([]);
@@ -48,11 +48,18 @@ export default function PedidosAdmin() {
     }
   };
 
+  // REFRESCAR AL VOLVER A LA PANTALLA
+  useFocusEffect(
+    React.useCallback(() => {
+      cargarPedidos();
+    }, [])
+  );
+
   const cargarPapelera = async () => {
     try {
       const res = await API.get("/pedidos?papelera=1");
       const data = Array.isArray(res.data) ? res.data : [];
-      // Filtrar solo los pedidos con estado cancelado o entregado
+      // SE FILTRAN LOS QUE ESTÁN CANCELADOS O ENTREGADOS
       const filtrados = data.filter(
         (p) =>
           ["cancelado", "entregado"].includes((p.estado || "").toLowerCase())
@@ -72,7 +79,7 @@ export default function PedidosAdmin() {
     if (mostrarPapelera) cargarPapelera();
   }, [mostrarPapelera]);
 
-  // Filtrado por búsqueda
+  // FILTRADO DE PEDIDOS SEGUN BUSQUEDA
   const pedidosFiltrados = pedidos.filter((p) => {
     const texto = search.trim().toLowerCase();
     return (
@@ -83,7 +90,7 @@ export default function PedidosAdmin() {
     );
   });
 
-  // Paginación
+  // PAGNACION
   const indiceUltimo = paginaActual * pedidosPorPagina;
   const indicePrimero = indiceUltimo - pedidosPorPagina;
   const pedidosVisibles = pedidosFiltrados.slice(indicePrimero, indiceUltimo);
@@ -128,7 +135,7 @@ export default function PedidosAdmin() {
     </View>
   );
 
-  // Utilidad para formatear fecha a local
+  // UTILIDAD PARA FORMATEAR FECHAS
   const formatFechaLocal = (fechaUTC) => {
     if (!fechaUTC) return "";
     const fecha = new Date(fechaUTC);
@@ -137,7 +144,7 @@ export default function PedidosAdmin() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f0f2f5" }}>
-      {/* Barra superior */}
+      {/* BARRA SUPERIOR */}
       <View style={styles.headerBar}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -154,7 +161,7 @@ export default function PedidosAdmin() {
         </TouchableOpacity>
       </View>
 
-      {/* Buscador */}
+      {/* BUSCADOR */}
       <View style={styles.searchContainer}>
         <Icon name="magnifying-glass" size={18} color="#666" />
         <TextInput
@@ -165,7 +172,7 @@ export default function PedidosAdmin() {
         />
       </View>
 
-      {/* Menú lateral */}
+      {/* MENU LATERAL */}
       <Modal
         visible={showMenu}
         transparent
@@ -183,7 +190,7 @@ export default function PedidosAdmin() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Lista con paginación */}
+      {/* LISTA DE PAGNACION */}
       <FlatList
         data={pedidosVisibles}
         keyExtractor={(item) => item.id_factura.toString()}
@@ -199,7 +206,7 @@ export default function PedidosAdmin() {
         }
       />
 
-      {/* Controles de paginación */}
+      {/* CONTROLES DE PAGINACION */}
       <View style={styles.pagination}>
         <TouchableOpacity
           style={[
@@ -230,7 +237,7 @@ export default function PedidosAdmin() {
         </TouchableOpacity>
       </View>
 
-      {/* Papelera de pedidos */}
+      {/* PAPELERA DE PEDIDOS*/}
       <Modal
         visible={mostrarPapelera}
         transparent
@@ -238,14 +245,14 @@ export default function PedidosAdmin() {
         onRequestClose={() => setMostrarPapelera(false)}
       >
         <View style={styles.papeleraOverlay}>
-          {/* Fondo clickeable para cerrar */}
+          {/* FONDO CLICKCLEABLE PARA CERRAR */}
           <TouchableOpacity
             style={StyleSheet.absoluteFillObject}
             activeOpacity={1}
             onPress={() => setMostrarPapelera(false)}
           />
 
-          {/* Contenedor del modal */}
+          {/* CONTENEDOR DEL MODAL */}
           <View style={styles.papeleraContainer}>
             <TouchableOpacity
               onPress={() => setMostrarPapelera(false)}
@@ -290,30 +297,38 @@ export default function PedidosAdmin() {
                   No hay pedidos en papelera
                 </Text>
               }
-              renderItem={({ item }) => (
-                <View style={styles.card}>
-                  <Text style={styles.label}>ID:</Text>
-                  <Text style={styles.value}>{item.id_factura}</Text>
-                  <Text style={styles.label}>Cliente:</Text>
-                  <Text style={styles.value}>{item.nombre_cliente}</Text>
-                  <Text style={styles.label}>Estado:</Text>
-                  <Text style={styles.value}>{item.estado}</Text>
-                  <Text style={styles.label}>Fecha eliminado:</Text>
-                  <Text style={styles.value}>
-                    {formatFechaLocal(item.fecha_eliminado)}
-                  </Text>
-                  <View style={styles.actions}>
-                    <TouchableOpacity
-                      style={styles.viewButton}
-                      onPress={() =>
-                        navigation.navigate("VerFactura", { id: item.id_factura })
-                      }
-                    >
-                      <Text style={styles.actionText}>Observar</Text>
-                    </TouchableOpacity>
+              renderItem={({ item }) => {
+                let productosArray = [];
+                try {
+                  productosArray = JSON.parse(item.productos || '[]');
+                } catch (e) {
+                  productosArray = [];
+                }
+                return (
+                  <View style={styles.card}>
+                    <Text style={styles.label}>ID:</Text>
+                    <Text style={styles.value}>{item.id_factura}</Text>
+                    <Text style={styles.label}>Cliente:</Text>
+                    <Text style={styles.value}>{item.nombre_cliente}</Text>
+                    <Text style={styles.label}>Estado:</Text>
+                    <Text style={styles.value}>{item.estado}</Text>
+                    <Text style={styles.label}>Fecha eliminado:</Text>
+                    <Text style={styles.value}>
+                      {formatFechaLocal(item.fecha_eliminado)}
+                    </Text>
+                    <View style={styles.actions}>
+                      <TouchableOpacity
+                        style={styles.viewButton}
+                        onPress={() =>
+                          navigation.navigate("VerFactura", { id: item.id_factura })
+                        }
+                      >
+                        <Text style={styles.actionText}>Observar</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              )}
+                );
+              }}
             />
           </View>
         </View>
