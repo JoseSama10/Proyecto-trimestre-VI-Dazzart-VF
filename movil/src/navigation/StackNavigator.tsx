@@ -24,6 +24,7 @@ import UsuariosAdmin from '../screens/admin/GestionUsuarios'
 import EditarUsuario from '../screens/admin/EditarUsuario'
 import AgregarUsuario from '../screens/admin/AgregarUsuarios'
 import Pedidos from '../screens/admin/Pedidos';
+import VerFactura from '../screens/admin/VerFactura';
 
 // Tipado de rutas
 export type RootStackParamList = {
@@ -49,13 +50,14 @@ export type RootStackParamList = {
   EditarUsuario: undefined;
   AgregarUsuario: undefined;
   Pedidos: undefined;
+  VerFactura: { id_pedido: number };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Estadisticas">
+    <Stack.Navigator initialRouteName="Index">
       <Stack.Screen
         name="Index"
         component={Index}
@@ -108,9 +110,6 @@ export default function StackNavigator() {
         options={{ title: 'Estadísticas' }}
       />
       
-
-
-      {/* Pantallas de productos */}
       <Stack.Screen
         name="Productos"
         component={Productos}
@@ -156,6 +155,11 @@ export default function StackNavigator() {
         name="Pedidos"
         component={Pedidos}
         options={{ title: 'Pedidos'}}
+      />
+      <Stack.Screen
+        name="VerFactura"
+        component={VerFactura}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
