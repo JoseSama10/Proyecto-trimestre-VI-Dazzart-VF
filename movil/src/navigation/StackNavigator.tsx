@@ -55,7 +55,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Pedidos">
+    <Stack.Navigator initialRouteName="Estadisticas">
       <Stack.Screen
         name="Index"
         component={Index}
