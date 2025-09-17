@@ -180,7 +180,12 @@ export default function UsuariosAdmin() {
                         <FontAwesomeIcon icon={faEdit} /> Editar
                       </button>
 
-                      {usuario.estado.toLowerCase() === "activo" ? (
+                      {/*  Bloqueamos botones si es admin principal */}
+                      {usuario.id_usuario === 1 ||
+                      usuario.correo_electronico ===
+                        "josecrack13113@gmail.com" ? (
+                        <span className="text-muted">Admin principal</span>
+                      ) : usuario.estado.toLowerCase() === "activo" ? (
                         <button
                           onClick={() =>
                             cambiarEstadoUsuario(usuario.id_usuario, "Inactivo")

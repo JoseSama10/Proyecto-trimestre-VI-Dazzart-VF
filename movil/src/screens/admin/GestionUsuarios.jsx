@@ -31,7 +31,7 @@ export default function UsuariosAdmin() {
       const res = await API.get("/usuarios");
       const data = Array.isArray(res.data) ? res.data : [];
 
-      // 🔹 Ordenar por id numérico
+      //  Ordenar por id numérico
       const dataOrdenada = data.sort(
         (a, b) => a.id_usuario - b.id_usuario
       );
@@ -49,7 +49,7 @@ export default function UsuariosAdmin() {
   useEffect(() => {
     cargarUsuarios(); // carga inicial
 
-    // 🔄 Auto-actualización cada 5 segundos
+    //  Auto-actualización cada 5 segundos
     const intervalo = setInterval(() => {
       cargarUsuarios();
     }, 5000);
@@ -57,7 +57,7 @@ export default function UsuariosAdmin() {
     return () => clearInterval(intervalo); // limpiar al desmontar
   }, []);
 
-  // 🔎 Filtrado por búsqueda (nombre, usuario, correo)
+  //  Filtrado por búsqueda (nombre, usuario, correo)
   const usuariosFiltrados = usuarios.filter((u) => {
     const texto = search.trim().toLowerCase();
     return (
@@ -67,7 +67,7 @@ export default function UsuariosAdmin() {
     );
   });
 
-  // 📌 Paginación sobre los filtrados
+  // Paginación sobre los filtrados
   const indiceUltimo = paginaActual * usuariosPorPagina;
   const indicePrimero = indiceUltimo - usuariosPorPagina;
   const usuariosVisibles = usuariosFiltrados.slice(
@@ -78,6 +78,7 @@ export default function UsuariosAdmin() {
     usuariosFiltrados.length / usuariosPorPagina
   );
 
+  //  Renderizado de usuario (con excepción para el admin principal)
   const renderUsuario = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.label}>ID:</Text>
@@ -122,8 +123,9 @@ export default function UsuariosAdmin() {
         {item.estado}
       </Text>
 
-      {/* Acciones */}
+      {/* 🔹 Acciones */}
       <View style={styles.actions}>
+        {/* Botón Editar */}
         <TouchableOpacity
           style={styles.editButton}
           onPress={() =>
@@ -134,54 +136,61 @@ export default function UsuariosAdmin() {
         >
           <Text style={styles.actionText}>Editar</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={
-            item.estado.toLowerCase() === "activo"
-              ? styles.inactivateButton
-              : styles.activateButton
-          }
-          onPress={() =>
-            Alert.alert(
-              `${
-                item.estado.toLowerCase() === "activo"
-                  ? "Inactivar"
-                  : "Activar"
-              } usuario`,
-              "¿Estás seguro?",
-              [
-                { text: "Cancelar", style: "cancel" },
-                {
-                  text: "Sí",
-                  onPress: async () => {
-                    try {
-                      await API.put(
-                        `/usuarios/${item.id_usuario}/estado`,
-                        {
-                          estado:
-                            item.estado.toLowerCase() === "activo"
-                              ? "Inactivo"
-                              : "Activo",
-                        }
-                      );
-                      await cargarUsuarios();
-                    } catch (err) {
-                      Alert.alert(
-                        "Error",
-                        "No se pudo cambiar el estado"
-                      );
-                    }
+
+        {/* Botón Activar/Inactivar excepto admin principal */}
+        {!(
+          item.id_usuario === 1 &&
+          item.correo_electronico === "josecrack13113@gmail.com"
+        ) && (
+          <TouchableOpacity
+            style={
+              item.estado.toLowerCase() === "activo"
+                ? styles.inactivateButton
+                : styles.activateButton
+            }
+            onPress={() =>
+              Alert.alert(
+                `${
+                  item.estado.toLowerCase() === "activo"
+                    ? "Inactivar"
+                    : "Activar"
+                } usuario`,
+                "¿Estás seguro?",
+                [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Sí",
+                    onPress: async () => {
+                      try {
+                        await API.put(
+                          `/usuarios/${item.id_usuario}/estado`,
+                          {
+                            estado:
+                              item.estado.toLowerCase() === "activo"
+                                ? "Inactivo"
+                                : "Activo",
+                          }
+                        );
+                        await cargarUsuarios();
+                      } catch (err) {
+                        Alert.alert(
+                          "Error",
+                          "No se pudo cambiar el estado"
+                        );
+                      }
+                    },
                   },
-                },
-              ]
-            )
-          }
-        >
-          <Text style={styles.actionText}>
-            {item.estado.toLowerCase() === "activo"
-              ? "Inactivar"
-              : "Activar"}
-          </Text>
-        </TouchableOpacity>
+                ]
+              )
+            }
+          >
+            <Text style={styles.actionText}>
+              {item.estado.toLowerCase() === "activo"
+                ? "Inactivar"
+                : "Activar"}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -205,7 +214,7 @@ export default function UsuariosAdmin() {
         </TouchableOpacity>
       </View>
 
-      {/* 🔎 Barra de búsqueda */}
+      {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
         <Icon name="magnifying-glass" size={18} color="#666" />
         <TextInput
@@ -416,3 +425,4 @@ const styles = StyleSheet.create({
     color: "#333",
   },
 });
+

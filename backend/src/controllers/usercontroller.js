@@ -142,14 +142,41 @@ exports.cambiarEstadoUsuario = async (req, res) => {
   const { estado } = req.body;
 
   try {
+    //  Verificar que el usuario exista
+    const [rows] = await db.query(
+      "SELECT id_usuario, correo_electronico FROM usuario WHERE id_usuario = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const usuario = rows[0];
+
+    //  Bloquear si es el admin principal e intentan inactivarlo
+    if (
+      (usuario.id_usuario === 1 ||
+        usuario.correo_electronico === "josecrack13113@gmail.com") &&
+      estado.toLowerCase() === "inactivo"
+    ) {
+      return res.status(403).json({
+        error: "No se puede desactivar al administrador principal",
+      });
+    }
+
+    //  Si pasa las validaciones  actualizar
     await db.query(
-      'UPDATE usuario SET estado = ? WHERE id_usuario = ?',
+      "UPDATE usuario SET estado = ? WHERE id_usuario = ?",
       [estado, id]
     );
+
     res.json({ message: `Usuario ${estado}` });
   } catch (error) {
-    console.error('Error al cambiar estado:', error);
-    res.status(500).json({ error: 'Error al cambiar el estado del usuario' });
+    console.error("Error al cambiar estado:", error);
+    res
+      .status(500)
+      .json({ error: "Error al cambiar el estado del usuario" });
   }
 };
 
