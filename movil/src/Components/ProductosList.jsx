@@ -6,10 +6,11 @@ import API from '../config/api';
 import styles from '../css/ProductosList';
 
 export const ProductoCard = ({ producto, onVerDetalle, onAgregarCarrito, showIcons, onPress }) => {
-  let imgUrl = producto?.urlImagen || producto?.imagen;
-  if (imgUrl && (imgUrl.startsWith('/img/') || imgUrl.startsWith('img/'))) {
-    imgUrl = imgUrl.replace(/^\/?img\//, '');
-    imgUrl = `${API.defaults.baseURL.replace(/\/api$/, '')}/productos/img/${imgUrl}`;
+  let imgUrl = undefined;
+  if (producto?.imagen) {
+    // UNIFICA SIEMPRE MUSTRARA LA IMAGEN SIN IMPORATR EL FORMATO DEL QUE SE GUARDO
+    const nombreArchivo = producto.imagen.replace(/^\/?img\//, '');
+    imgUrl = `${API.defaults.baseURL.replace(/\/api$/, '')}/productos/img/${encodeURIComponent(nombreArchivo)}`;
   }
 
   // FORMATEO DE PRECIOS CON PUNTOS DE MILES
