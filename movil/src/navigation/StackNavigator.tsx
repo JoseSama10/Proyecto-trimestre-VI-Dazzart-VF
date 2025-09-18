@@ -1,3 +1,4 @@
+import RestablecerContraScreen from '../screens/RestablecerContraScreen';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -28,6 +29,7 @@ import VerFactura from '../screens/admin/VerFactura';
 
 // Tipado de rutas
 export type RootStackParamList = {
+  RestablecerContra: { token: string };
   Index: undefined;
   Carrito: undefined;
   Register: undefined;
@@ -159,6 +161,11 @@ export default function StackNavigator() {
       <Stack.Screen
         name="VerFactura"
         component={VerFactura}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RestablecerContra"
+        component={RestablecerContraScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
