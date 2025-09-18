@@ -46,14 +46,7 @@ export default function EstadisticasAdmin() {
         pedidosValidos.forEach(p => {
           if (!p.productos) return;
 
-          let productosArray = [];
-
-          try {
-            productosArray = JSON.parse(p.productos);
-          } catch (error) {
-            console.warn(`Error parseando productos del pedido ${p.id_factura}:`, error);
-            return;
-          }
+          let productosArray = Array.isArray(p.productos) ? p.productos : [];
 
           productosArray.forEach(prod => {
             const nombre = prod.nombre?.trim() || 'Desconocido';
