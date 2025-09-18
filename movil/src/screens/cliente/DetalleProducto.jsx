@@ -57,7 +57,7 @@ export default function DetalleProducto() {
             id_producto: producto._id || producto.id || producto.id_producto,
             cantidad: cantidad,
         });
-        setModalCarrito(true); // ✅ abre el modal que ya tienes definido
+        setModalCarrito(true); 
     } catch (e) {
         setMensajeModal('Error al agregar al carrito');
         setModalVisible(true);
