@@ -15,6 +15,10 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 	const [nombreUsuario, setNombreUsuario] = useState('');
 	const [showErrorModal, setShowErrorModal] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+	const [forgotVisible, setForgotVisible] = useState(false);
+	const [forgotEmail, setForgotEmail] = useState('');
+	const [forgotFeedback, setForgotFeedback] = useState(null);
+	const [forgotLoading, setForgotLoading] = useState(false);
 	const navigation = useNavigation();
 
 	// EXPONER FUNCION GLOBAL PARA LIMPIAR CAMPOS
@@ -27,26 +31,42 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 	}
 
 	const handleLogin = async () => {
-			try {
-				const res = await API.post('/login/login', {
-					correo_electronico: usuario.trim(),
-					contrasena: password.trim(),
-				});
-				const { user } = res.data;
-				// Guardar usuario en AsyncStorage
-				const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
-				await AsyncStorage.setItem('usuario', JSON.stringify(user));
-				onLogin && onLogin(user);
-				if (user.id_rol === 1) {
-					setShowBienvenida(true);
-				} else {
-					setNombreUsuario(user.nombre || user.nombre_usuario || user.correo_electronico || '');
-					setShowBienvenidaUsuario(true);
-				}
-			} catch (err) {
-				setShowErrorModal(true);
+		try {
+			const res = await API.post('/login/login', {
+				correo_electronico: usuario.trim(),
+				contrasena: password.trim(),
+			});
+			const { user } = res.data;
+			// Guardar usuario en AsyncStorage
+			const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+			await AsyncStorage.setItem('usuario', JSON.stringify(user));
+			onLogin && onLogin(user);
+			if (user.id_rol === 1) {
+				setShowBienvenida(true);
+			} else {
+				setNombreUsuario(user.nombre || user.nombre_usuario || user.correo_electronico || '');
+				setShowBienvenidaUsuario(true);
 			}
+		} catch (err) {
+			setShowErrorModal(true);
+		}
 	};
+
+	// FLUJO OLVIDÓ CONTRASEÑA
+		const handleForgotPassword = async () => {
+			setForgotLoading(true);
+			setForgotFeedback(null);
+			try {
+				console.log('Enviando petición a /auth/forgot-password con:', forgotEmail.trim());
+				const res = await API.post('/login/forgot-password', { correo_electronico: forgotEmail.trim() });
+				console.log('Respuesta del backend:', res.data);
+				setForgotFeedback({ success: true, message: 'Revisa tu correo para restablecer la contraseña.' });
+			} catch (err) {
+				console.log('Error recibido del backend:', err?.response?.data || err);
+				setForgotFeedback({ success: false, message: err?.response?.data?.message || 'Error al enviar el correo.' });
+			}
+			setForgotLoading(false);
+		};
 
 		// LIMPIAR CAMPOS Y CERRAR MODAL
 		const handleClose = () => {
@@ -56,8 +76,8 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 			onClose && onClose();
 		};
 
-		return (
-			<>
+			return (
+				<>
 				{/* MODAL PRINCIPAL DEL LOGIN */}
 				<Modal visible={visible} animationType="fade" transparent>
 					<TouchableOpacity
@@ -105,14 +125,66 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 								<Text style={{ color: '#888', fontSize: 28 }}>✖</Text>
 							</TouchableOpacity>
 
-							<View style={styles.linksRow}>
-								<TouchableOpacity onPress={() => Linking.openURL('#')}>
-									<Text style={styles.link}>¿Olvidó su contraseña?</Text>
-								</TouchableOpacity>
+													<View style={styles.linksRow}>
+														<TouchableOpacity onPress={() => setForgotVisible(true)}>
+															<Text style={styles.link}>¿Olvidó su contraseña?</Text>
+														</TouchableOpacity>
 														<TouchableOpacity onPress={() => navigation.navigate('Register')}>
 															<Text style={styles.link}>Registrarse</Text>
 														</TouchableOpacity>
-							</View>
+													</View>
+
+										{/* MODAL OLVIDÓ CONTRASEÑA */}
+										<Modal visible={forgotVisible} animationType="fade" transparent>
+											<TouchableOpacity
+												activeOpacity={1}
+												style={styles.overlay}
+												onPress={() => {
+													setForgotVisible(false);
+													setForgotEmail('');
+													setForgotFeedback(null);
+												}}
+											>
+												<View style={styles.modalContainer} pointerEvents="box-none">
+													<Text style={styles.title}>Recuperar contraseña</Text>
+													<Text style={{ marginBottom: 12, color: '#444', textAlign: 'center' }}>
+														Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+													</Text>
+													<View style={styles.inputGroup}>
+														<MaterialIcons name="email" size={24} style={styles.iconInput} />
+														<TextInput
+															style={styles.input}
+															placeholder="Correo electrónico"
+															value={forgotEmail}
+															onChangeText={setForgotEmail}
+															autoCapitalize="none"
+															keyboardType="email-address"
+															placeholderTextColor="#888"
+														/>
+													</View>
+													<TouchableOpacity
+														style={styles.button}
+														onPress={handleForgotPassword}
+														disabled={forgotLoading || !forgotEmail.trim()}
+													>
+														<MaterialIcons name="send" size={22} color="#fff" />
+														<Text style={styles.buttonText}>{forgotLoading ? 'Enviando...' : 'Enviar'}</Text>
+													</TouchableOpacity>
+													{forgotFeedback && (
+														<Text style={{ color: forgotFeedback.success ? '#28a745' : '#d32f2f', marginTop: 10, textAlign: 'center' }}>
+															{forgotFeedback.message}
+														</Text>
+													)}
+													<TouchableOpacity style={styles.closeBtn} onPress={() => {
+														setForgotVisible(false);
+														setForgotEmail('');
+														setForgotFeedback(null);
+													}}>
+														<Text style={{ color: '#888', fontSize: 28 }}>✖</Text>
+													</TouchableOpacity>
+												</View>
+											</TouchableOpacity>
+										</Modal>
 						</View>
 					</TouchableOpacity>
 				</Modal>
