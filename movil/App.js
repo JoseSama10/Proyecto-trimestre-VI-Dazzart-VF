@@ -1,6 +1,19 @@
 import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
+import * as Linking from 'expo-linking';
+const linking = {
+  prefixes: ['dazzart://'],
+  config: {
+    screens: {
+      RestablecerContra: {
+        path: 'reset-password/:token',
+        parse: { token: (token) => `${token}` },
+      },
+      // MAS PANTALLAS SI SE QUIERE 
+    },
+  },
+};
 import StackNavigator from './src/navigation/StackNavigator';
 import * as SplashScreen from 'expo-splash-screen'; 
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins'; 
@@ -33,7 +46,7 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <StackNavigator />
       </NavigationContainer>
     </GestureHandlerRootView>
