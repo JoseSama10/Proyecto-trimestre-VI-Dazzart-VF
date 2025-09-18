@@ -52,6 +52,7 @@ const createApp = () => {
   app.use('/api/carrito', carritoRouter);
   app.use('/api/usuarios', userRoutes);
   app.use('/api/descuentos', descuentoRoutes);
+  
 
   // Imágenes
   app.use('/productos/img', express.static(path.join(__dirname, '../public/img')));
