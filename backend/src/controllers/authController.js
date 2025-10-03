@@ -20,7 +20,7 @@ exports.login = async (req, res) => {
       [correo_electronico]
     );
 
-    console.log(" Resultados query:", results); //  log de query
+    console.log(" Resultados query:", results); 
 
     if (results.length === 0) {
       console.warn(" Usuario no encontrado:", correo_electronico);

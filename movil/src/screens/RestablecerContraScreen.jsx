@@ -13,9 +13,24 @@ const RestablecerContraScreen = () => {
 
   // EL TOKEN PUEDE VENIR POR PARÁMETRO EN LA RUTA
   const token = route.params?.token || '';
-  console.log('TOKEN recibido:', route.params?.token);
+  console.log('TOKEN recibido:', token);
+
+  // BLOQUE DE VALIDACIÓN DE TOKEN
+  if (!token) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: '#d32f2f', textAlign: 'center' }}>
+          Token inválido o faltante. Intenta de nuevo desde el enlace de tu correo.
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Index')} style={{ marginTop: 18 }}>
+          <Text style={{ color: '#1976d2', textAlign: 'center' }}>Volver al inicio de sesión</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const handleRestablecer = async () => {
+    // BLOQUE DE VALIDACIÓN DE CONTRASEÑA
     if (!nuevaContrasena || nuevaContrasena.length < 6) {
       setFeedback({ success: false, message: 'La contraseña debe tener al menos 6 caracteres.' });
       return;
@@ -27,6 +42,7 @@ const RestablecerContraScreen = () => {
     setLoading(true);
     setFeedback(null);
     try {
+      // PETICIÓN AL BACKEND CON TOKEN Y NUEVA CONTRASEÑA
       const res = await API.post('/login/reset-password', {
         token,
         nuevaContrasena,
@@ -60,12 +76,13 @@ const RestablecerContraScreen = () => {
       <TouchableOpacity style={styles.button} onPress={handleRestablecer} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Restablecer</Text>}
       </TouchableOpacity>
+      {/* BLOQUE DE FEEDBACK */}
       {feedback && (
         <Text style={{ color: feedback.success ? '#28a745' : '#d32f2f', marginTop: 12, textAlign: 'center' }}>
           {feedback.message}
         </Text>
       )}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 18 }}>
+      <TouchableOpacity onPress={() => navigation.navigate('Index')} style={{ marginTop: 18 }}>
         <Text style={{ color: '#1976d2', textAlign: 'center' }}>Volver al inicio de sesión</Text>
       </TouchableOpacity>
     </View>
@@ -116,3 +133,14 @@ const styles = StyleSheet.create({
 });
 
 export default RestablecerContraScreen;
+
+const linking = {
+  prefixes: ['dazzart://'],
+  config: {
+    screens: {
+      RestablecerContra: {
+        path: 'reset-password/:token'
+      },
+    },
+  },
+};

@@ -3,9 +3,8 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
-// Configura tu transportador de correo aquí
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Cambia según tu proveedor
+  service: 'gmail', 
   auth: {
     user: 'jopsezabaleta5@gmail.com',
     pass: 'czvm nhop xzev uova',

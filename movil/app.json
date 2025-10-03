@@ -1,11 +1,11 @@
 {
   "expo": {
   "name": "Dazzart Components",
-  "slug": "dazzart-components",
+  "slug": "movil",
     "version": "1.0.0",
     "orientation": "portrait",
   "icon": "./src/assets/logo.png",
-  "scheme": "dazzart-components",
+  "scheme": "dazzart",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -13,7 +13,6 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
