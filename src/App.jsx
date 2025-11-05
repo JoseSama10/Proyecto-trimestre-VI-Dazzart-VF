@@ -5,12 +5,11 @@ import ProductoDetalle from "./pages/cliente/ProductoDetalle";
 import VistaProductos from "./pages/cliente/VistaProductos.jsx";
 import RegistroDazzart from "./pages/cliente/Registro.jsx";
 import VistaBusqueda from "./pages/cliente/VistaBusqueda.jsx";
-import CarritoPage from "./pages/cliente/carritoPage";
+import CarritoPage from "./pages/cliente/CarritoPage";
 import MisCompras from "./pages/cliente/MisCompras";
 import MisDatos from "./pages/cliente/MisDatos";
 import Factura from './pages/cliente/Factura.jsx';
 import PedidosUser from './pages/cliente/PedidosUser.jsx';
-
 
 
 import ProductosAdmin from "./pages/admin/productos";
