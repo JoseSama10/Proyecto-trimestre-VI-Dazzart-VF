@@ -3,8 +3,9 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
+// Configura tu transportador de correo aquí
 const transporter = nodemailer.createTransport({
-  service: 'gmail', 
+  service: 'gmail', // Cambia según tu proveedor
   auth: {
     user: 'jopsezabaleta5@gmail.com',
     pass: 'czvm nhop xzev uova',
@@ -28,13 +29,25 @@ exports.solicitarReset = async (req, res) => {
     console.log('Token generado:', token);
     const expires = new Date(Date.now() + 1000 * 60 * 30); // 30 minutos
     await db.query('UPDATE usuario SET reset_token = ?, reset_token_expires = ? WHERE correo_electronico = ?', [token, expires, correo_electronico]);
-    const resetUrl = `dazzart://reset-password/${token}`;
-    console.log('Enviando correo a:', correo_electronico, 'con URL:', resetUrl);
+    // Preferir una URL web para que los clientes (Gmail, navegadores) puedan abrirla.
+    // Puedes configurar FRONTEND_URL en las variables de entorno (ej: https://tu-dominio.com).
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${FRONTEND_URL.replace(/\/$/, '')}/reset-password/${token}`;
+    // Deep link opcional para intentar abrir la app móvil (si está instalada y registrada)
+    const deepLink = `dazzart://reset-password/${token}`;
+    console.log('Enviando correo a:', correo_electronico, 'con URL web:', resetUrl, 'y deepLink:', deepLink);
     await transporter.sendMail({
       from: 'TU_CORREO@gmail.com',
       to: correo_electronico,
       subject: 'Recupera tu contraseña',
-      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetUrl}">${resetUrl}</a>`
+      html: `
+        <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <hr />
+        <p>Si estás en un móvil y tienes la app instalada, puedes intentar abrir directamente la app con este enlace:</p>
+        <p><a href="${deepLink}">${deepLink}</a></p>
+        <p>Si el deep link no funciona al hacer clic, usa el enlace web anterior o copia/pega el deep link en el navegador del móvil.</p>
+      `
     });
     console.log('Correo enviado correctamente a:', correo_electronico);
     res.json({ message: 'Correo de recuperación enviado' });

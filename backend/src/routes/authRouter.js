@@ -6,7 +6,7 @@ const authController = require('../controllers/authController');
 const olvidoPaswordController = require('../controllers/olvidoPaswordController');
 
 router.post('/login', authController.login);
-// RECUPERACION DE CONTRASEÑA
+// Recuperación de contraseña
 router.post('/forgot-password', olvidoPaswordController.solicitarReset);
 router.post('/reset-password', olvidoPaswordController.resetPassword);
 

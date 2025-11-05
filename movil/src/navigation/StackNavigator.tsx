@@ -59,7 +59,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Index">
+    <Stack.Navigator initialRouteName="RestablecerContra">
       <Stack.Screen
         name="Index"
         component={Index}

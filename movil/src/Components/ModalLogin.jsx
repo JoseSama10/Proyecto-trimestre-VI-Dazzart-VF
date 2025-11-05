@@ -171,9 +171,29 @@ const ModalLogin = ({ visible, onClose, onLogin }) => {
 														<Text style={styles.buttonText}>{forgotLoading ? 'Enviando...' : 'Enviar'}</Text>
 													</TouchableOpacity>
 													{forgotFeedback && (
-														<Text style={{ color: forgotFeedback.success ? '#28a745' : '#d32f2f', marginTop: 10, textAlign: 'center' }}>
-															{forgotFeedback.message}
-														</Text>
+														<>
+															<Text style={{ color: forgotFeedback.success ? '#28a745' : '#d32f2f', marginTop: 10, textAlign: 'center' }}>
+																{forgotFeedback.message}
+															</Text>
+															{forgotFeedback.success && (
+																<>
+																	<Text style={{ color: '#444', marginTop: 8, textAlign: 'center' }}>
+																		Pulsa el botón para abrir la pantalla de restablecer y pega el codigo o la URL que recibiste por correo.
+																	</Text>
+																	<TouchableOpacity
+																		style={[styles.button, { marginTop: 10 }]}
+																		onPress={() => {
+																			setForgotVisible(false);
+																			setForgotEmail('');
+																			setForgotFeedback(null);
+																			navigation.navigate('RestablecerContra', { token: '' });
+																		}}
+																	>
+																		<Text style={styles.buttonText}>Restablecer Contraseña</Text>
+																	</TouchableOpacity>
+																</>
+															)}
+														</>
 													)}
 													<TouchableOpacity style={styles.closeBtn} onPress={() => {
 														setForgotVisible(false);

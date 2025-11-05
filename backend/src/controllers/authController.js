@@ -20,7 +20,7 @@ exports.login = async (req, res) => {
       [correo_electronico]
     );
 
-    console.log(" Resultados query:", results); 
+    console.log(" Resultados query:", results); //  log de query
 
     if (results.length === 0) {
       console.warn(" Usuario no encontrado:", correo_electronico);
@@ -54,6 +54,7 @@ exports.login = async (req, res) => {
       { id_usuario: user.id_usuario, id_rol: user.id_rol },
       SECRET
     );
+    console.log("Token JWT generado:", token); // <-- Aquí se muestra el token en consola
 
     console.log("Login exitoso para usuario ID:", user.id_usuario);
 
