@@ -14,13 +14,31 @@ exports.registerUser = async (req, res) => {
   } = req.body;
 
   try {
+    // Verificar si ya existe un usuario con el mismo nombre_usuario o correo
+    const [rows] = await db.query(
+      `SELECT * FROM usuario WHERE nombre_usuario = ? OR correo_electronico = ?`,
+      [nombre_usuario, correo_electronico]
+    );
+
+    if (rows.length > 0) {
+      // Si ya existe uno con ese nombre de usuario o correo
+      return res.status(400).json({
+        error:
+          rows[0].nombre_usuario === nombre_usuario
+            ? 'El nombre de usuario ya está registrado'
+            : 'El correo electrónico ya está registrado'
+      });
+    }
+
+    // Si no existe, continuar con el registro
     const hashedPassword = await bcrypt.hash(contrasena, 10);
     const id_rol = 2; // 2 = cliente
 
     const sql = `
       INSERT INTO usuario 
       (nombre, nombre_usuario, correo_electronico, telefono, contrasena, cedula, direccion, id_rol)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     await db.query(sql, [
       nombre,
@@ -39,6 +57,7 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar el usuario' });
   }
 };
+
 
 // Lista usuarios en el crud usuarios //
 exports.listarUsuarios = async (req, res) => {

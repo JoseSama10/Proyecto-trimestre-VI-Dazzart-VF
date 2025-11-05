@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../css/CSSA/actualizarusuario.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Swal from 'sweetalert2';
 
 import SidebarAdmin from '../../components/SideBarAdmin.jsx';
 
 export default function EditarUsuario() {
-  const { id } = useParams(); // Asegúrate que en App.jsx tienes la ruta como /editar-usuario/:id
+  const { id } = useParams();
   const navigate = useNavigate();
+
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario) {
@@ -47,7 +48,11 @@ export default function EditarUsuario() {
         });
       } catch (err) {
         console.error('Error al obtener usuario:', err);
-        Swal.fire('Error', 'No se pudo cargar la información del usuario', 'error');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cargar la información del usuario.',
+        });
       }
     };
 
@@ -55,22 +60,42 @@ export default function EditarUsuario() {
   }, [id]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validaciones simples
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(formData.nombre)) {
+      Swal.fire('Error', 'El nombre solo puede contener letras y espacios.', 'warning');
+      return;
+    }
+
+    if (!/^\d{10}$/.test(formData.telefono)) {
+      Swal.fire('Error', 'El número de celular debe tener exactamente 10 dígitos numéricos.', 'warning');
+      return;
+    }
+
     try {
       const res = await axios.put(`http://localhost:3001/api/usuarios/${id}`, formData);
       if (res.status === 200) {
-        Swal.fire('Actualizado', 'El usuario ha sido actualizado con éxito', 'success')
-          .then(() => navigate('/admin-usuarios'));
+        Swal.fire({
+          icon: 'success',
+          title: 'Usuario actualizado con éxito',
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          navigate('/admin-usuarios');
+        });
       }
     } catch (err) {
       console.error('Error al actualizar:', err);
-      Swal.fire('Error', 'No se pudo actualizar el usuario', 'error');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo actualizar el usuario.',
+      });
     }
   };
 
@@ -83,35 +108,81 @@ export default function EditarUsuario() {
 
         <div className="d-flex justify-content-center align-items-center vh-80">
           <form onSubmit={handleSubmit} className="p-4 bg-light rounded shadow-sm w-50">
-
+            
+            {/* Nombre */}
             <div className="mb-3">
               <label className="form-label">Nombre</label>
-              <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange} required />
+              <input
+                type="text"
+                className="form-control"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                required
+                pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+"
+                title="Solo se permiten letras y espacios"
+              />
             </div>
 
+            {/* Nombre de usuario */}
             <div className="mb-3">
               <label className="form-label">Nombre de usuario</label>
-              <input type="text" className="form-control" name="nombre_usuario" value={formData.nombre_usuario} onChange={handleChange} required />
+              <input
+                type="text"
+                className="form-control"
+                name="nombre_usuario"
+                value={formData.nombre_usuario}
+                onChange={handleChange}
+                required
+              />
             </div>
 
+            {/* Correo */}
             <div className="mb-3">
               <label className="form-label">Correo electrónico</label>
-              <input type="email" className="form-control" name="correo" value={formData.correo} onChange={handleChange} required />
+              <input
+                type="email"
+                className="form-control"
+                name="correo"
+                value={formData.correo}
+                onChange={handleChange}
+                required
+              />
             </div>
 
+            {/* Celular */}
             <div className="mb-3">
               <label className="form-label">Celular</label>
-              <input type="text" className="form-control" name="telefono" value={formData.telefono} onChange={handleChange} required />
+              <input
+                type="text"
+                className="form-control"
+                name="telefono"
+                value={formData.telefono}
+                onChange={handleChange}
+                required
+                pattern="\d{10}"
+                title="Debe contener exactamente 10 números"
+                maxLength={10}
+              />
             </div>
 
+            {/* Dirección */}
             <div className="mb-3">
               <label className="form-label">Dirección</label>
-              <input type="text" className="form-control" name="direccion" value={formData.direccion} onChange={handleChange} required />
+              <input
+                type="text"
+                className="form-control"
+                name="direccion"
+                value={formData.direccion}
+                onChange={handleChange}
+                required
+              />
             </div>
 
+            {/* Contraseña */}
             <div className="mb-3">
               <label className="form-label">Nueva contraseña (opcional)</label>
-              <div style={{ position: 'relative' }}>
+              <div className="position-relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="form-control"
@@ -138,9 +209,16 @@ export default function EditarUsuario() {
               </div>
             </div>
 
+            {/* Rol */}
             <div className="mb-3">
               <label className="form-label">Rol</label>
-              <input type="text" className="form-control" name="rol" value={formData.rol} readOnly />
+              <input
+                type="text"
+                className="form-control"
+                name="rol"
+                value={formData.rol}
+                readOnly
+              />
             </div>
 
             <div className="text-center mt-4">
