@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import API from '../config/api';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -10,27 +11,35 @@ const RestablecerContraScreen = () => {
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // EL TOKEN PUEDE VENIR POR PARÁMETRO EN LA RUTA
   const token = route.params?.token || '';
-  console.log('TOKEN recibido:', token);
+  console.log('TOKEN recibido:', route.params?.token);
+  const [tokenManual, setTokenManual] = useState('');
 
-  // BLOQUE DE VALIDACIÓN DE TOKEN
-  if (!token) {
-    return (
-      <View style={styles.container}>
-        <Text style={{ color: '#d32f2f', textAlign: 'center' }}>
-          Token inválido o faltante. Intenta de nuevo desde el enlace de tu correo.
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Index')} style={{ marginTop: 18 }}>
-          <Text style={{ color: '#1976d2', textAlign: 'center' }}>Volver al inicio de sesión</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  // Si el usuario pega una URL completa, intentar extraer solo el token
+  const onChangeTokenManual = (text) => {
+    if (!text) return setTokenManual('');
+    try {
+      // Normalizar espacios
+      const t = text.trim();
+      // Buscar '/reset-password/' o variaciones comunes y extraer lo que venga después
+      const match = t.match(/reset[-_]?password\/(.+)$/i);
+      if (match && match[1]) {
+        // Puede incluir parámetros o fragmentos, quitar después de ? o #
+        const tokenOnly = match[1].split(/[?#]/)[0];
+        setTokenManual(tokenOnly);
+      } else {
+        setTokenManual(t);
+      }
+    } catch (_e) {
+      setTokenManual(text);
+    }
+  };
 
   const handleRestablecer = async () => {
-    // BLOQUE DE VALIDACIÓN DE CONTRASEÑA
     if (!nuevaContrasena || nuevaContrasena.length < 6) {
       setFeedback({ success: false, message: 'La contraseña debe tener al menos 6 caracteres.' });
       return;
@@ -39,12 +48,16 @@ const RestablecerContraScreen = () => {
       setFeedback({ success: false, message: 'Las contraseñas no coinciden.' });
       return;
     }
+    const actualToken = token || tokenManual;
+    if (!actualToken) {
+      setFeedback({ success: false, message: 'Código faltante. Pega el código recibido por correo o la URL de restablecimiento.' });
+      return;
+    }
     setLoading(true);
     setFeedback(null);
     try {
-      // PETICIÓN AL BACKEND CON TOKEN Y NUEVA CONTRASEÑA
       const res = await API.post('/login/reset-password', {
-        token,
+        token: actualToken,
         nuevaContrasena,
       });
       setFeedback({ success: true, message: '¡Contraseña restablecida correctamente! Ahora puedes iniciar sesión.' });
@@ -57,34 +70,64 @@ const RestablecerContraScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Restablecer Contraseña</Text>
+      {/* Si no hay token en la ruta, mostrar un campo para pegar el token (útil en Expo Go) */}
+      {!token && (
+        <>
+          <Text style={styles.label}>Código de recuperación</Text>
+          <TextInput
+            style={styles.input}
+            value={tokenManual}
+            onChangeText={onChangeTokenManual}
+            placeholder="Pega aquí el código o la URL de restablecimiento"
+            autoCapitalize="none"
+          />
+        </>
+      )}
+
       <Text style={styles.label}>Nueva contraseña</Text>
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={nuevaContrasena}
-        onChangeText={setNuevaContrasena}
-        placeholder="Nueva contraseña"
-      />
+      <View style={{ position: 'relative' }}>
+        <TextInput
+          style={[styles.input, { paddingRight: 44 }]}
+          secureTextEntry={!showPassword}
+          value={nuevaContrasena}
+          onChangeText={setNuevaContrasena}
+          placeholder="Nueva contraseña"
+        />
+        <TouchableOpacity onPress={() => setShowPassword(p => !p)} style={{ position: 'absolute', right: 10, top: 12 }}>
+          <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} size={22} color="#888" />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.label}>Confirmar contraseña</Text>
-      <TextInput
-        style={styles.input}
-        secureTextEntry
-        value={confirmarContrasena}
-        onChangeText={setConfirmarContrasena}
-        placeholder="Confirmar contraseña"
-      />
+      <View style={{ position: 'relative' }}>
+        <TextInput
+          style={[styles.input, { paddingRight: 44 }]}
+          secureTextEntry={!showConfirmPassword}
+          value={confirmarContrasena}
+          onChangeText={setConfirmarContrasena}
+          placeholder="Confirmar contraseña"
+        />
+        <TouchableOpacity onPress={() => setShowConfirmPassword(p => !p)} style={{ position: 'absolute', right: 10, top: 12 }}>
+          <MaterialIcons name={showConfirmPassword ? 'visibility-off' : 'visibility'} size={22} color="#888" />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleRestablecer} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Restablecer</Text>}
       </TouchableOpacity>
-      {/* BLOQUE DE FEEDBACK */}
       {feedback && (
         <Text style={{ color: feedback.success ? '#28a745' : '#d32f2f', marginTop: 12, textAlign: 'center' }}>
           {feedback.message}
         </Text>
       )}
-      <TouchableOpacity onPress={() => navigation.navigate('Index')} style={{ marginTop: 18 }}>
+      <TouchableOpacity onPress={() => {
+        if (navigation.canGoBack && navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.navigate('Index');
+        }
+      }} style={{ marginTop: 18 }}>
         <Text style={{ color: '#1976d2', textAlign: 'center' }}>Volver al inicio de sesión</Text>
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -133,14 +176,3 @@ const styles = StyleSheet.create({
 });
 
 export default RestablecerContraScreen;
-
-const linking = {
-  prefixes: ['dazzart://'],
-  config: {
-    screens: {
-      RestablecerContra: {
-        path: 'reset-password/:token'
-      },
-    },
-  },
-};

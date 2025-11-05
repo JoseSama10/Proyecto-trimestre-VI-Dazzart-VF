@@ -2,7 +2,6 @@ import { LogBox } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
-import { useEffect } from 'react';
 const linking = {
   prefixes: ['dazzart://'],
   config: {
@@ -19,36 +18,30 @@ import StackNavigator from './src/navigation/StackNavigator';
 import * as SplashScreen from 'expo-splash-screen'; 
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins'; 
 
-// IGNORAR ADVERTENCIAS ESPECÍFICAS
+// Ignorar advertencias específicas
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews',
 ]);
 
+// Mantener splash screen hasta que las fuentes carguen
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  // CARGAR FUENTES
+  // Cargar fuentes
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_700Bold,
   });
 
+  // Ocultar splash cuando las fuentes estén listas
   const onLayoutRootView = async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
   };
 
-  useEffect(() => {
-    const getUrlAsync = async () => {
-      const initialUrl = await Linking.getInitialURL();
-      console.log('URL inicial recibida:', initialUrl);
-    };
-    getUrlAsync();
-  }, []);
-
   if (!fontsLoaded) {
-    return null; 
+    return null; // Mostrar pantalla en blanco mientras cargan fuentes
   }
 
   return (

@@ -33,7 +33,7 @@ CREATE TABLE usuario (
   contrasena VARCHAR(255) NOT NULL,
   cedula VARCHAR(255) NOT NULL,
   direccion VARCHAR(255) NOT NULL,
-  estado ENUM('Activo','Inactivo') NOT NULL DEFAULT 'Activo', -- 👈 agregado
+  estado ENUM('Activo','Inactivo') NOT NULL DEFAULT 'Activo', 
   id_rol INT NOT NULL,
   FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
 );
