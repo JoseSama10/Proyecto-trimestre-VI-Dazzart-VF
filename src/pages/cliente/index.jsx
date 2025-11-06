@@ -11,13 +11,11 @@ import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ModalProducto from '../../components/cliente/ModalProducto';
 import ModalLogin from '../../components/cliente/ModalLogin';
 
-import '../../css/CSS/ClienteHome.css';
+import '../../css/CSS/clienteHome.css';
 import '../../css/CSS/CardsProducto.css';
 import '../../css/CSS/ModalConfirmacion.css';
 import '../../css/CSS/ModalProducto.css';
-
-const BASE_URL = 'http://localhost:3001/api';
-const IMG_URL = 'http://localhost:3001/productos/img';
+import API, { BASE_API as BASE_URL, imgUrl } from '../../config/api';
 
 export default function ClienteHome() {
   const [showMenu, setShowMenu] = useState(false);
