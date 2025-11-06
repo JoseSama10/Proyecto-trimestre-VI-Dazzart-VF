@@ -31,10 +31,8 @@ export default function UsuariosAdmin() {
       const res = await API.get("/usuarios");
       const data = Array.isArray(res.data) ? res.data : [];
 
-      //  Ordenar por id numérico
-      const dataOrdenada = data.sort(
-        (a, b) => a.id_usuario - b.id_usuario
-      );
+      // Ordenar por id numérico
+      const dataOrdenada = data.sort((a, b) => a.id_usuario - b.id_usuario);
 
       setUsuarios(dataOrdenada);
       setPaginaActual(1);
@@ -47,17 +45,10 @@ export default function UsuariosAdmin() {
   };
 
   useEffect(() => {
-    cargarUsuarios(); // carga inicial
-
-    //  Auto-actualización cada 5 segundos
-    const intervalo = setInterval(() => {
-      cargarUsuarios();
-    }, 5000);
-
-    return () => clearInterval(intervalo); // limpiar al desmontar
+    cargarUsuarios(); // solo carga inicial
   }, []);
 
-  //  Filtrado por búsqueda (nombre, usuario, correo)
+  // Filtrado por búsqueda
   const usuariosFiltrados = usuarios.filter((u) => {
     const texto = search.trim().toLowerCase();
     return (
@@ -70,15 +61,9 @@ export default function UsuariosAdmin() {
   // Paginación sobre los filtrados
   const indiceUltimo = paginaActual * usuariosPorPagina;
   const indicePrimero = indiceUltimo - usuariosPorPagina;
-  const usuariosVisibles = usuariosFiltrados.slice(
-    indicePrimero,
-    indiceUltimo
-  );
-  const totalPaginas = Math.ceil(
-    usuariosFiltrados.length / usuariosPorPagina
-  );
+  const usuariosVisibles = usuariosFiltrados.slice(indicePrimero, indiceUltimo);
+  const totalPaginas = Math.ceil(usuariosFiltrados.length / usuariosPorPagina);
 
-  //  Renderizado de usuario (con excepción para el admin principal)
   const renderUsuario = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.label}>ID:</Text>
@@ -113,19 +98,14 @@ export default function UsuariosAdmin() {
         style={[
           styles.value,
           {
-            color:
-              item.estado.toLowerCase() === "activo"
-                ? "green"
-                : "gray",
+            color: item.estado.toLowerCase() === "activo" ? "green" : "gray",
           },
         ]}
       >
         {item.estado}
       </Text>
 
-      {/* 🔹 Acciones */}
       <View style={styles.actions}>
-        {/* Botón Editar */}
         <TouchableOpacity
           style={styles.editButton}
           onPress={() =>
@@ -137,7 +117,6 @@ export default function UsuariosAdmin() {
           <Text style={styles.actionText}>Editar</Text>
         </TouchableOpacity>
 
-        {/* Botón Activar/Inactivar excepto admin principal */}
         {!(
           item.id_usuario === 1 &&
           item.correo_electronico === "josecrack13113@gmail.com"
@@ -162,21 +141,15 @@ export default function UsuariosAdmin() {
                     text: "Sí",
                     onPress: async () => {
                       try {
-                        await API.put(
-                          `/usuarios/${item.id_usuario}/estado`,
-                          {
-                            estado:
-                              item.estado.toLowerCase() === "activo"
-                                ? "Inactivo"
-                                : "Activo",
-                          }
-                        );
+                        await API.put(`/usuarios/${item.id_usuario}/estado`, {
+                          estado:
+                            item.estado.toLowerCase() === "activo"
+                              ? "Inactivo"
+                              : "Activo",
+                        });
                         await cargarUsuarios();
                       } catch (err) {
-                        Alert.alert(
-                          "Error",
-                          "No se pudo cambiar el estado"
-                        );
+                        Alert.alert("Error", "No se pudo cambiar el estado");
                       }
                     },
                   },
@@ -197,7 +170,6 @@ export default function UsuariosAdmin() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f0f2f5" }}>
-      {/* Barra superior */}
       <View style={styles.headerBar}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -214,7 +186,6 @@ export default function UsuariosAdmin() {
         </TouchableOpacity>
       </View>
 
-      {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
         <Icon name="magnifying-glass" size={18} color="#666" />
         <TextInput
@@ -225,7 +196,6 @@ export default function UsuariosAdmin() {
         />
       </View>
 
-      {/* Menú lateral */}
       <Modal
         visible={showMenu}
         transparent
@@ -243,17 +213,13 @@ export default function UsuariosAdmin() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Lista con paginación */}
       <FlatList
         data={usuariosVisibles}
         keyExtractor={(item) => item.id_usuario.toString()}
         contentContainerStyle={{ padding: 16 }}
         renderItem={renderUsuario}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={cargarUsuarios}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={cargarUsuarios} />
         }
         ListEmptyComponent={
           <Text style={{ textAlign: "center", marginTop: 20 }}>
@@ -262,7 +228,6 @@ export default function UsuariosAdmin() {
         }
       />
 
-      {/* Controles de paginación */}
       <View style={styles.pagination}>
         <TouchableOpacity
           style={[
@@ -425,4 +390,3 @@ const styles = StyleSheet.create({
     color: "#333",
   },
 });
-

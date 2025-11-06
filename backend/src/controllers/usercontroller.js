@@ -21,13 +21,30 @@ exports.registerUser = async (req, res) => {
     );
 
     if (rows.length > 0) {
-      // Si ya existe uno con ese nombre de usuario o correo
-      return res.status(400).json({
-        error:
-          rows[0].nombre_usuario === nombre_usuario
-            ? 'El nombre de usuario ya está registrado'
-            : 'El correo electrónico ya está registrado'
-      });
+  const existeUsuario = rows.some(u => u.nombre_usuario === nombre_usuario);
+  const existeCorreo = rows.some(u => u.correo_electronico === correo_electronico);
+
+  let mensajeError = '';
+  if (existeUsuario && existeCorreo) {
+    mensajeError = 'El nombre de usuario y el correo electrónico ya están registrados';
+  } else if (existeUsuario) {
+    mensajeError = 'El nombre de usuario ya está registrado';
+  } else if (existeCorreo) {
+    mensajeError = 'El correo electrónico ya está registrado';
+  } else {
+    mensajeError = 'El usuario o correo ya existe en el sistema'; // mensaje por defecto
+  }
+
+  return res.status(400).json({ error: mensajeError });
+}
+
+    // Validaciones básicas del teléfono y cédula (solo números, 10 dígitos)
+    const soloNumeros = /^\d{10}$/;
+    if (!soloNumeros.test(telefono)) {
+      return res.status(400).json({ error: 'El teléfono debe tener exactamente 10 dígitos numéricos' });
+    }
+    if (!soloNumeros.test(cedula)) {
+      return res.status(400).json({ error: 'La cédula debe tener exactamente 10 dígitos numéricos' });
     }
 
     // Si no existe, continuar con el registro
@@ -57,7 +74,6 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: 'Error al registrar el usuario' });
   }
 };
-
 
 // Lista usuarios en el crud usuarios //
 exports.listarUsuarios = async (req, res) => {
@@ -124,37 +140,67 @@ exports.actualizarUsuario = async (req, res) => {
     correo,
     telefono,
     direccion,
-    contrasena
+    contrasena,
   } = req.body;
   const { id } = req.params;
 
   try {
-    
-    await db.query(`
+    // 🔎 Verificar si el nombre_usuario ya existe en otro usuario
+    const [usuarioNombre] = await db.query(
+      "SELECT id_usuario FROM usuario WHERE nombre_usuario = ? AND id_usuario != ?",
+      [nombre_usuario, id]
+    );
+
+    if (usuarioNombre.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "El nombre de usuario ya está en uso." });
+    }
+
+    // 🔎 Verificar si el correo ya existe en otro usuario
+    const [usuarioCorreo] = await db.query(
+      "SELECT id_usuario FROM usuario WHERE correo_electronico = ? AND id_usuario != ?",
+      [correo, id]
+    );
+
+    if (usuarioCorreo.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "El correo electrónico ya está registrado." });
+    }
+
+    // 🔧 Actualizar datos básicos
+    await db.query(
+      `
       UPDATE usuario SET 
         nombre = ?, 
         nombre_usuario = ?, 
         correo_electronico = ?, 
         telefono = ?, 
         direccion = ?
-      WHERE id_usuario = ?`,
+      WHERE id_usuario = ?
+      `,
       [nombre, nombre_usuario, correo, telefono, direccion, id]
     );
 
-    if (contrasena && contrasena.trim() !== '') {
+    // 🔐 Actualizar contraseña solo si se envió una nueva
+    if (contrasena && contrasena.trim() !== "") {
       const hashedPassword = await bcrypt.hash(contrasena, 10);
       await db.query(
-        'UPDATE usuario SET contrasena = ? WHERE id_usuario = ?',
+        "UPDATE usuario SET contrasena = ? WHERE id_usuario = ?",
         [hashedPassword, id]
       );
     }
 
-    res.json({ message: 'Usuario actualizado' });
+    res.json({ message: "Usuario actualizado correctamente." });
   } catch (error) {
-    console.error('Error al actualizar usuario:', error);
-    res.status(500).json({ error: error.message });
+    console.error("Error al actualizar usuario:", error);
+    res.status(500).json({
+      error: "Error interno del servidor al actualizar el usuario.",
+    });
   }
 };
+
 
 exports.cambiarEstadoUsuario = async (req, res) => {
   const { id } = req.params;

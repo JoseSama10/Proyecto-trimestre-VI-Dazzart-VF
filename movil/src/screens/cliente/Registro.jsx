@@ -30,30 +30,52 @@ const RegistroDazzart = ({ navigation }) => {
     let valid = true;
     let newErrors = {};
 
+    // Nombre: obligatorio, solo letras y espacios
     if (!formData.nombre.trim()) {
       newErrors.nombre = "El nombre es obligatorio";
       valid = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(formData.nombre)) {
+      newErrors.nombre = "El nombre solo puede contener letras y espacios";
+      valid = false;
     }
+
+    // Usuario: obligatorio
     if (!formData.usuario.trim()) {
       newErrors.usuario = "El usuario es obligatorio";
       valid = false;
     }
+
+    // Cédula: solo números y exactamente 10 dígitos
     if (!formData.cedula.trim()) {
       newErrors.cedula = "La cédula es obligatoria";
       valid = false;
+    } else if (!/^\d{10}$/.test(formData.cedula)) {
+      newErrors.cedula = "La cédula debe tener exactamente 10 números";
+      valid = false;
     }
+
+    // Correo: debe contener "@"
     if (!formData.email.includes("@")) {
       newErrors.email = "Correo inválido";
       valid = false;
     }
+
+    // Contraseña: mínimo 6 caracteres
     if (formData.password.length < 6) {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres";
       valid = false;
     }
+
+    // Teléfono: solo números y exactamente 10 dígitos
     if (!formData.telefono.trim()) {
       newErrors.telefono = "El teléfono es obligatorio";
       valid = false;
+    } else if (!/^\d{10}$/.test(formData.telefono)) {
+      newErrors.telefono = "El teléfono debe tener exactamente 10 números";
+      valid = false;
     }
+
+    // Dirección: obligatoria
     if (!formData.direccion.trim()) {
       newErrors.direccion = "La dirección es obligatoria";
       valid = false;
@@ -79,7 +101,13 @@ const RegistroDazzart = ({ navigation }) => {
       setModalVisible(true);
     } catch (error) {
       console.error("Error al registrar:", error);
-      Alert.alert("Error", "No se pudo registrar el usuario");
+
+      const mensajeError =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Error desconocido al registrar usuario";
+
+      Alert.alert("Error al registrar", mensajeError);
     }
   };
 
@@ -90,7 +118,8 @@ const RegistroDazzart = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Registro</Text>
-        {/* ...inputs y botón igual... */}
+
+        {/* Campo: Nombre */}
         <TextInput
           style={[styles.input, errors.nombre && styles.errorInput]}
           placeholder="Nombre"
@@ -98,6 +127,8 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, nombre: text })}
         />
         {errors.nombre && <Text style={styles.errorText}>{errors.nombre}</Text>}
+
+        {/* Campo: Usuario */}
         <TextInput
           style={[styles.input, errors.usuario && styles.errorInput]}
           placeholder="Usuario"
@@ -105,13 +136,18 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, usuario: text })}
         />
         {errors.usuario && <Text style={styles.errorText}>{errors.usuario}</Text>}
+
+        {/* Campo: Cédula */}
         <TextInput
           style={[styles.input, errors.cedula && styles.errorInput]}
           placeholder="Cédula"
           value={formData.cedula}
           onChangeText={(text) => setFormData({ ...formData, cedula: text })}
+          keyboardType="numeric"
         />
         {errors.cedula && <Text style={styles.errorText}>{errors.cedula}</Text>}
+
+        {/* Campo: Correo */}
         <TextInput
           style={[styles.input, errors.email && styles.errorInput]}
           placeholder="Correo electrónico"
@@ -120,6 +156,8 @@ const RegistroDazzart = ({ navigation }) => {
           keyboardType="email-address"
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
+        {/* Campo: Contraseña */}
         <TextInput
           style={[styles.input, errors.password && styles.errorInput]}
           placeholder="Contraseña"
@@ -128,6 +166,8 @@ const RegistroDazzart = ({ navigation }) => {
           secureTextEntry
         />
         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
+        {/* Campo: Teléfono */}
         <TextInput
           style={[styles.input, errors.telefono && styles.errorInput]}
           placeholder="Teléfono"
@@ -136,6 +176,8 @@ const RegistroDazzart = ({ navigation }) => {
           keyboardType="phone-pad"
         />
         {errors.telefono && <Text style={styles.errorText}>{errors.telefono}</Text>}
+
+        {/* Campo: Dirección */}
         <TextInput
           style={[styles.input, errors.direccion && styles.errorInput]}
           placeholder="Dirección"
@@ -143,29 +185,34 @@ const RegistroDazzart = ({ navigation }) => {
           onChangeText={(text) => setFormData({ ...formData, direccion: text })}
         />
         {errors.direccion && <Text style={styles.errorText}>{errors.direccion}</Text>}
+
+        {/* Botón de registro */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Registrarse</Text>
         </TouchableOpacity>
       </ScrollView>
-      {/* Modal de registro correcto */}
+
+      {/* Modal de registro exitoso */}
       <Modal
         visible={modalVisible}
         transparent
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-          <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 28, alignItems: 'center', width: 280 }}>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#00bfa5', marginBottom: 12 }}>¡Registro exitoso!</Text>
-            <Text style={{ fontSize: 16, color: '#222', marginBottom: 18, textAlign: 'center' }}>Tu usuario ha sido creado correctamente.</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>¡Registro exitoso!</Text>
+            <Text style={styles.modalMessage}>
+              Tu usuario ha sido creado correctamente.
+            </Text>
             <TouchableOpacity
-              style={{ backgroundColor: '#00bfa5', paddingVertical: 10, paddingHorizontal: 24, borderRadius: 8 }}
+              style={styles.modalButton}
               onPress={() => {
                 setModalVisible(false);
-                navigation.navigate('Index');
+                navigation.navigate("Index");
               }}
             >
-              <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Ir al inicio</Text>
+              <Text style={styles.modalButtonText}>Ir al inicio</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -177,7 +224,7 @@ const RegistroDazzart = ({ navigation }) => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: "cover", 
+    resizeMode: "cover",
   },
   container: {
     flexGrow: 1,
@@ -188,7 +235,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
     fontWeight: "bold",
-    color: "#fff", 
+    color: "#fff",
   },
   input: {
     borderWidth: 1,
@@ -196,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 20,
-    backgroundColor: "rgba(255,255,255,0.9)", 
+    backgroundColor: "rgba(255,255,255,0.9)",
     width: "100%",
   },
   button: {
@@ -217,6 +264,42 @@ const styles = StyleSheet.create({
   },
   errorInput: {
     borderColor: "red",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 28,
+    alignItems: "center",
+    width: 280,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#00bfa5",
+    marginBottom: 12,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: "#222",
+    marginBottom: 18,
+    textAlign: "center",
+  },
+  modalButton: {
+    backgroundColor: "#00bfa5",
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
