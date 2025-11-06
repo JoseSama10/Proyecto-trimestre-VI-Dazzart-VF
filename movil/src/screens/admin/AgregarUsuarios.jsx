@@ -33,28 +33,57 @@ export default function AgregarUsuario() {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    let nuevoValor = value;
 
-  const handleSubmit = async () => {
-    // Validación de cédula
-    if (!/^\d{8,10}$/.test(formData.cedula)) {
-      Alert.alert("Error", "La cédula debe tener entre 8 y 10 dígitos numéricos.");
-      return;
+    // Validaciones dinámicas
+    if (name === "cedula") {
+      // Solo números y máximo 10 dígitos
+      nuevoValor = value.replace(/[^0-9]/g, "").slice(0, 10);
+    } else if (name === "telefono") {
+      // Solo números y máximo 10 dígitos
+      nuevoValor = value.replace(/[^0-9]/g, "").slice(0, 10);
+    } else if (name === "nombre") {
+      // Solo letras y espacios
+      nuevoValor = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ\s]/g, "");
     }
 
-    try {
-      const res = await API.post("/usuarios", formData);
-      if (res.status === 201) {
-        Alert.alert("Éxito", "Usuario administrador creado con éxito", [
-          { text: "OK", onPress: () => navigation.goBack() },
-        ]);
-      }
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Error", "No se pudo registrar el administrador");
-    }
+    setFormData((prev) => ({ ...prev, [name]: nuevoValor }));
   };
+
+const handleSubmit = async () => {
+  // Validaciones antes de enviar
+  if (!/^\d{8,10}$/.test(formData.cedula)) {
+    Alert.alert("Error", "La cédula debe tener entre 8 y 10 dígitos numéricos.");
+    return;
+  }
+  if (!/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/.test(formData.nombre)) {
+    Alert.alert("Error", "El nombre solo puede contener letras y espacios.");
+    return;
+  }
+  if (!/^\d{10}$/.test(formData.telefono)) {
+    Alert.alert("Error", "El número de celular debe tener exactamente 10 dígitos.");
+    return;
+  }
+
+  try {
+    const res = await API.post("/usuarios", formData);
+    if (res.status === 201) {
+      Alert.alert("Éxito", "Usuario administrador creado con éxito", [
+        { text: "OK", onPress: () => navigation.goBack() },
+      ]);
+    }
+  } catch (err) {
+    console.error("Error al registrar usuario:", err);
+
+    const errorMessage =
+      err.response?.data?.error ||
+      err.response?.data?.message ||
+      "Ocurrió un error desconocido al registrar el usuario.";
+
+    Alert.alert("Error", errorMessage);
+  }
+};
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f0f2f5" }}>
@@ -128,6 +157,7 @@ export default function AgregarUsuario() {
             onChangeText={(val) => handleChange("telefono", val)}
             placeholder="Teléfono"
             keyboardType="phone-pad"
+            maxLength={10}
           />
         </View>
 

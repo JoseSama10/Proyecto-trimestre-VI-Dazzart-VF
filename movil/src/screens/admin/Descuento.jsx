@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 
 export default function DescuentosAdmin() {
   const [descuentos, setDescuentos] = useState([]);
-  const [search, setSearch] = useState(""); 
+  const [search, setSearch] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [paginaActual, setPaginaActual] = useState(1);
@@ -59,18 +59,12 @@ export default function DescuentosAdmin() {
     ]);
   };
 
-  // 🔄 Cargar datos al montar y cada 5s
+  // 🔹 Cargar solo una vez al montar el componente
   useEffect(() => {
-    cargarDescuentos(); // primera carga
-
-    const intervalo = setInterval(() => {
-      cargarDescuentos(); // recarga cada 5 segundos
-    }, 5000);
-
-    return () => clearInterval(intervalo); // limpieza
+    cargarDescuentos();
   }, []);
 
-  // Filtrado por búsqueda
+  // 🔹 Filtrado por búsqueda
   const descuentosFiltrados = descuentos.filter((d) => {
     const texto = search.trim().toLowerCase();
     const fechaInicio = d.fecha_inicio?.split("T")[0] || "";
@@ -89,7 +83,7 @@ export default function DescuentosAdmin() {
     );
   });
 
-  //Paginación
+  // 🔹 Paginación
   const indiceUltimo = paginaActual * descuentosPorPagina;
   const indicePrimero = indiceUltimo - descuentosPorPagina;
   const descuentosVisibles = descuentosFiltrados.slice(
@@ -132,7 +126,7 @@ export default function DescuentosAdmin() {
           : "Todos"}
       </Text>
 
-      {/* Acciones */}
+      {/* 🔹 Acciones */}
       <View style={styles.actions}>
         <TouchableOpacity
           style={styles.editButton}
@@ -154,7 +148,7 @@ export default function DescuentosAdmin() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f0f2f5" }}>
-      {/* Barra superior */}
+      {/* 🔹 Barra superior */}
       <View style={styles.headerBar}>
         <TouchableOpacity
           style={styles.menuButton}
@@ -171,7 +165,7 @@ export default function DescuentosAdmin() {
         </TouchableOpacity>
       </View>
 
-      {/*  Buscador */}
+      {/* 🔹 Buscador */}
       <View style={styles.searchContainer}>
         <Icon name="magnifying-glass" size={18} color="#666" />
         <TextInput
@@ -182,7 +176,7 @@ export default function DescuentosAdmin() {
         />
       </View>
 
-      {/* Menú lateral */}
+      {/* 🔹 Menú lateral */}
       <Modal
         visible={showMenu}
         transparent
@@ -200,7 +194,7 @@ export default function DescuentosAdmin() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Lista con paginación */}
+      {/* 🔹 Lista con paginación */}
       <FlatList
         data={descuentosVisibles}
         keyExtractor={(item) => item.id_descuento.toString()}
@@ -216,7 +210,7 @@ export default function DescuentosAdmin() {
         }
       />
 
-      {/* Controles de paginación */}
+      {/* 🔹 Controles de paginación */}
       <View style={styles.pagination}>
         <TouchableOpacity
           style={[
