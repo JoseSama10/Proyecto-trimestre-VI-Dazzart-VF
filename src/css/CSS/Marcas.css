@@ -1,0 +1,30 @@
+.marcas-section {
+  background-color: #fff;
+  padding: 0.5rem 1rem 2rem 1rem; /* padding lateral para que no toque bordes */
+  box-sizing: border-box;
+  width: 100%; /* que ocupe todo el ancho del contenedor padre sin overflow */
+  overflow-x: hidden; /* evita scroll horizontal */
+}
+
+
+.marcas-grid .marca-item {
+  padding: 8px; /* menos padding para que ocupe menos vertical */
+  transition: transform 0.2s ease;
+}
+
+.marcas-grid .marca-item:hover {
+  transform: scale(1.05);
+}
+
+.marcas-grid img {
+  max-height: 70px;
+  width: auto;
+  object-fit: contain;
+  padding: 5px; /* menos padding para reducir espacio */
+  filter: grayscale(0.3);
+  transition: filter 0.3s ease;
+}
+
+.marcas-grid img:hover {
+  filter: grayscale(0);
+}

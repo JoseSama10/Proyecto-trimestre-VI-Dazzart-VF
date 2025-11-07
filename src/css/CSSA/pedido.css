@@ -1,0 +1,86 @@
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  
+  /* Sidebar fijo */
+  .sidebar {
+    width: 250px;
+    height: 100vh;
+    background: #212529;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
+  }
+  
+  .sidebar a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+  }
+  
+  .sidebar a:hover {
+    background: #343a40;
+    border-radius: 5px;
+  }
+  
+  /* Ajuste del contenido principal */
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+  }
+  
+  /* Ocultar sidebar en móviles y usar Offcanvas */
+  @media (max-width: 768px) {
+    .sidebar {
+      display: none;
+    }
+    .main-content {
+      margin-left: 0;
+    }
+  }
+
+  /* Estilo general para la tabla */
+  .table {
+    width: 100%;
+    border-collapse: separate; /* Asegúrate de que los bordes no colapsen */
+    border-spacing: 3px 3px; /* Espaciado entre columnas (horizontal y vertical) */
+    margin-top: 20px;
+    font-size: 14px; /* Tamaño de fuente */
+    background-color: #ffffff; /* Fondo blanco */
+  }
+  
+  /* Estilo para las celdas */
+  .table th, .table td {
+    text-align: center; /* Centra el contenido */
+    padding: 15px; /* Espaciado interno */
+    border: 1px solid #ddd; /* Bordes de las celdas */
+  }
+  
+  /* Estilo para el encabezado */
+  .table-dark th {
+    background-color: #343a40; /* Fondo oscuro */
+    color: white; /* Texto blanco */
+    font-weight: bold; /* Texto en negrita */
+  }
+  
+  /* Estilo para filas alternadas */
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Fondo claro para filas impares */
+  }
+  
+  .table-striped tbody tr:nth-of-type(even) {
+    background-color: #e9ecef; /* Fondo gris claro para filas pares */
+  }
+  
+  /* Estilo para el hover */
+  .table-hover tbody tr:hover {
+    background-color: #d6d8db; /* Fondo gris claro al pasar el mouse */
+  }
+  
+  /* Estilo para los botones */
+  .table .btn {
+    margin: 0 5px; /* Espaciado entre botones */
+  }
