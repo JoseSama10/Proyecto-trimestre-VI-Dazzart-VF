@@ -29,6 +29,14 @@ const createApp = () => {
     credentials: true,
   }));
 
+  // Ensure preflight requests are handled for all routes
+  app.options('*', cors({
+    origin: (origin, callback) => callback(null, true),
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
+  }));
+
   // Middleware
   app.use(express.json());
 
@@ -58,6 +66,16 @@ const createApp = () => {
   app.use('/productos/img', express.static(path.join(__dirname, '../public/img')));
 
    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  // Error handling middleware (JSON responses) - last middleware
+  app.use((err, req, res, next) => {
+    console.error('ERROR HANDLER:', err && err.stack ? err.stack : err);
+    const status = err && err.status ? err.status : 500;
+    res.status(status).json({
+      success: false,
+      message: err && err.message ? err.message : 'Error interno del servidor'
+    });
+  });
+
   return app;
 };
 
