@@ -105,7 +105,7 @@ export default function ClienteHome() {
   const abrirModalLupa = producto => {
     const nombreImg = producto.imagen?.replace(/^\/?.*img\//, '') || '';
     const urlImagen = nombreImg
-      ? `${IMG_URL}/${encodeURIComponent(nombreImg)}?t=${Date.now()}`
+      ? `${imgUrl(nombreImg)}?t=${Date.now()}`
       : '/default.png';
     setProductoSeleccionado({ ...producto, urlImagen });
     setModalLupaOpen(true);
@@ -155,9 +155,9 @@ export default function ClienteHome() {
             style={{ scrollBehavior: 'smooth', gap: '16px', paddingBottom: 0, marginBottom: '2rem' }}
           >
             {cicloInfinito.map((prod, index) => {
-              const nombreImg = prod.imagen?.replace(/^\/?.*img\//, '') || '';
+              const nombreImg = prod.imagen?.replace(/^\/? .*img\//, '') || '';
               const urlImagen = nombreImg
-                ? `${IMG_URL}/${encodeURIComponent(nombreImg)}?t=${Date.now()}`
+                ? `${imgUrl(nombreImg)}?t=${Date.now()}`
                 : '/default.png';
 
               return (

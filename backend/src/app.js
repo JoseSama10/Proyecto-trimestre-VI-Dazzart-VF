@@ -18,16 +18,24 @@ const authRouter = require('./routes/authRouter');
 const createApp = () => {
   const app = express();
 
-  // CORS
+  // CORS configuration
   app.use(cors({
-    origin: (origin, callback) => {
-      console.log('\nORIGEN Request:', origin);
-      callback(null, true);
-    },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
+    origin: ['http://localhost:5173', 'https://main.d3t813q1o1kf7z.amplifyapp.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true,
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
   }));
+
+  // Error handling middleware
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message,
+      error: process.env.NODE_ENV === 'development' ? err : {}
+    });
+  });
 
   // Middleware
   app.use(express.json());

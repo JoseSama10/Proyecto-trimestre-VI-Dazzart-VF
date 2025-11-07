@@ -1,0 +1,67 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 22,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    minHeight: 70,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 200,
+    height: 48,
+    resizeMode: 'contain',
+    marginRight: 5,
+  },
+  menuIcon: {
+    marginLeft: 5,
+  },
+  searchContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 15,
+    paddingHorizontal: 12,
+    height: 40,
+    marginHorizontal: 16,
+    width: 260,
+    maxWidth: '70%',
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#222',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#bbb',
+    borderRadius: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginRight: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  iconGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  iconButton: {
+    marginHorizontal: 10,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+  },
+});
