@@ -7,7 +7,8 @@ import MenuLateral from '../../components/cliente/MenuLateral';
 import ProductoCard from '../../components/cliente/ProductoCard';
 import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ModalLogin from '../../components/cliente/ModalLogin';
-import Carrito from '../../components/cliente/Carrito';
+// Carrito component filename es `carrito.jsx` (lowercase)
+import Carrito from '../../components/cliente/carrito';
 import ModalProducto from '../../components/cliente/ModalProducto';
 
 const API_BASE = 'http://localhost:3001/api';

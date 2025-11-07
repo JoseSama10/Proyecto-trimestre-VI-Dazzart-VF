@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Headersimple from '../../components/cliente/SimpleHeader'
 import Footer from '../../components/cliente/Footer';
-import Carrito from '../../components/cliente/Carrito.jsx';
+// Carrito component filename is `carrito.jsx` (lowercase)
+import Carrito from '../../components/cliente/carrito';
 import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ModalLogin from '../../components/cliente/ModalLogin';
 

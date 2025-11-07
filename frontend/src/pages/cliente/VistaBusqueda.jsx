@@ -9,7 +9,8 @@ import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ModalLogin from '../../components/cliente/ModalLogin';
 import ModalProducto from '../../components/cliente/ModalProducto';
 // Importa Carrito si lo tienes disponible para mostrar
-import Carrito from '../../components/cliente/Carrito';
+// Carrito component filename es `carrito.jsx` (lowercase) — importa con la misma capitalización
+import Carrito from '../../components/cliente/carrito';
 
 const API_BASE = 'http://localhost:3001/api';
 const IMG_BASE = 'http://localhost:3001/productos/img';

@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../../components/cliente/Header';
 import Footer from '../../components/cliente/Footer';
 import MenuLateral from '../../components/cliente/MenuLateral';
-import Carrito from '../../components/cliente/Carrito';
+// Carrito component filename es `carrito.jsx` (lowercase)
+import Carrito from '../../components/cliente/carrito';
 
 export default function MisCompras() {
   const [compras, setCompras] = useState([]);
