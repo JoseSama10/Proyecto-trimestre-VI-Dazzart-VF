@@ -12,7 +12,8 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import SidebarAdmin from "../../components/SideBarAdmin.jsx";
-import API, { BASE_URL, imgUrl } from '../../config/api';
+
+const BASE_URL = "http://localhost:3001";
 
 export default function ProductosAdmin() {
   const [productos, setProductos] = useState([]);
@@ -20,7 +21,7 @@ export default function ProductosAdmin() {
 
   const cargarProductos = async () => {
     try {
-  const res = await API.get('/productos/listar');
+      const res = await axios.get(`${BASE_URL}/api/productos/listar`);
       if (Array.isArray(res.data)) {
         setProductos(res.data);
       } else {

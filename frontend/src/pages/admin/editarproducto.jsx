@@ -3,7 +3,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 import SidebarAdmin from "../../components/SideBarAdmin.jsx";
-import API, { BASE_URL, imgUrl } from '../../config/api';
+
+const BASE_URL = "http://localhost:3001";
 
 export default function EditarProducto() {
   const { id } = useParams();
@@ -41,7 +42,7 @@ export default function EditarProducto() {
 
   // Carga datos iniciales
   useEffect(() => {
-    API.get(`/productos/${id}`).then((res) => {
+    axios.get(`${BASE_URL}/api/productos/${id}`).then((res) => {
       const data = res.data;
       setProducto(data);
       setForm({
@@ -58,11 +59,11 @@ export default function EditarProducto() {
       setCacheBuster(Date.now()); // Forzar recarga imagen inicial
     });
 
-    API.get('/categorias/listar').then((res) => {
+    axios.get(`${BASE_URL}/api/categorias/listar`).then((res) => {
       setCategorias(res.data || []);
     });
 
-    API.get('/productos/listar-imagenes').then((res) => {
+    axios.get(`${BASE_URL}/api/productos/listar-imagenes`).then((res) => {
       setImagenesExistentes(res.data.imagenes || []);
     });
   }, [id]);

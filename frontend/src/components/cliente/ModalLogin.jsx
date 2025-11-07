@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock, faSignInAlt, faCrown, faBan } from '@fortawesome/free-solid-svg-icons';
 import '../../css/CSS/ModalProducto.css';
 import '../../css/CSS/ModalLogin.css';
-import API, { BASE_URL } from '../../config/api';
+import axios from 'axios';
 
 export default function ModalLogin({ visible, onClose, onLoginSuccess }) {
   const [correo, setCorreo] = useState('');
@@ -38,7 +38,7 @@ export default function ModalLogin({ visible, onClose, onLoginSuccess }) {
     setError('');
     setLoading(true);
     try {
-      const res = await API.post('/login/login', {
+      const res = await axios.post('http://localhost:3001/api/login/login', {
         correo_electronico: correo,
         contrasena
       });

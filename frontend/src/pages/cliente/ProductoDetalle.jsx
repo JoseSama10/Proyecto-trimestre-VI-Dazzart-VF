@@ -6,7 +6,8 @@ import MenuLateral from '../../components/cliente/MenuLateral';
 import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ProductoCard from '../../components/cliente/ProductoCard';
 import ModalLogin from '../../components/cliente/ModalLogin'; // <-- Asegúrate de importarlo
-import API, { BASE_URL, imgUrl } from '../../config/api';
+
+const BASE_URL = 'http://localhost:3001';
 
 export default function ProductoDetalle({
   producto: productoProp,

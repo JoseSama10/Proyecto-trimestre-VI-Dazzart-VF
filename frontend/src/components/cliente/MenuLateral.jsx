@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../css/CSS/MenuLateral.css";
-import API, { BASE_URL, imgUrl } from '../../config/api';
+
+const BASE_URL = "http://localhost:3001";
 
 export default function MenuLateral({ onClose }) {
   const [categorias, setCategorias] = useState([]);
@@ -10,17 +11,20 @@ export default function MenuLateral({ onClose }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    API.get('/categorias/listar')
-      .then((res) => setCategorias(res.data || []))
+    fetch(`${BASE_URL}/api/categorias/listar`)
+      .then((res) => res.json())
+      .then((data) => setCategorias(data))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
     if (categoriaActiva) {
-      API.get('/subcategorias/listar')
-        .then((res) => {
-          const data = res.data || [];
-          const filtradas = data.filter((sub) => sub.id_categoria === categoriaActiva);
+      fetch(`${BASE_URL}/api/subcategorias/listar`)
+        .then((res) => res.json())
+        .then((data) => {
+          const filtradas = data.filter(
+            (sub) => sub.id_categoria === categoriaActiva
+          );
           setSubcategorias(filtradas);
         })
         .catch(console.error);
