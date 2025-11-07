@@ -11,7 +11,7 @@ import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ModalProducto from '../../components/cliente/ModalProducto';
 import ModalLogin from '../../components/cliente/ModalLogin';
 
-import '../../css/CSS/ClienteHome.css';
+import '../../css/CSS/clienteHome.css';
 import '../../css/CSS/CardsProducto.css';
 import '../../css/CSS/ModalConfirmacion.css';
 import '../../css/CSS/ModalProducto.css';

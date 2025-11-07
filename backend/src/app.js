@@ -19,23 +19,45 @@ const createApp = () => {
   const app = express();
 
   // CORS
-  app.use(cors({
+  const corsOptions = {
     origin: (origin, callback) => {
       console.log('\nORIGEN Request:', origin);
-      callback(null, true);
+      // Lista de orígenes permitidos
+      const allowedOrigins = [
+        'http://localhost:5173',  // Vite dev server
+        'http://localhost:3000',  // Alternativo
+        'https://main.d3t813q1o1kf7z.amplifyapp.com', // Tu dominio de Amplify
+      ];
+      
+      // En desarrollo permitimos sin origen (Postman/curl)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('No permitido por CORS'));
+      }
     },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type,Authorization',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-  }));
+    optionsSuccessStatus: 204
+  };
 
-  // Ensure preflight requests are handled for all routes
-  app.options('*', cors({
-    origin: (origin, callback) => callback(null, true),
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type,Authorization',
-    credentials: true,
-  }));
+  // Aplicar CORS a todas las rutas
+  app.use(cors(corsOptions));
+
+  // Manejar OPTIONS para preflight en todas las rutas
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Methods', corsOptions.methods.join(','));
+      res.header('Access-Control-Allow-Headers', corsOptions.allowedHeaders.join(','));
+      return res.status(204).send();
+    }
+    next();
+  });
 
   // Middleware
   app.use(express.json());

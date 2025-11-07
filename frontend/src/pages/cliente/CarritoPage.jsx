@@ -8,7 +8,7 @@ import Carrito from '../../components/cliente/carrito';
 import ModalConfirmacion from '../../components/cliente/ModalConfirmacion';
 import ModalLogin from '../../components/cliente/ModalLogin';
 
-import '../../css/CSS/CarritoPage.css';
+import '../../css/CSS/carritopage.css';
 
 export default function CarritoPage() {
   const navigate = useNavigate();
